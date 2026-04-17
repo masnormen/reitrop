@@ -7,6 +7,7 @@ import { requestId } from "hono/request-id";
 import { trimTrailingSlash } from "hono/trailing-slash";
 import { z } from "zod";
 
+import type { Session, User } from "@/schema/user";
 import type { ExtractEnv } from "@/types/index";
 
 import { env } from "@/env";
@@ -31,24 +32,6 @@ const v1DefaultHook = <TContext extends Context>(
     });
     return c.json(errorMalformed.toResponseJSON(c.var.requestId), errorMalformed.status);
   }
-};
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  role: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-type Session = {
-  id: string;
-  userId: string;
-  createdAt: string;
-  expiresAt: string;
 };
 
 export const createV1App = () => {
@@ -94,13 +77,13 @@ export const createV1App = () => {
             status: "active",
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-          },
+          } satisfies User,
           session: {
             id: "456",
             userId: "123",
             createdAt: new Date().toISOString(),
             expiresAt: new Date(Date.now() + 3600000).toISOString(), // 1 hour from now
-          },
+          } satisfies Session,
         };
 
         if (!session) {
