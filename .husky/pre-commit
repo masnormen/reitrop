@@ -1,0 +1,2 @@
+pnpm run quality:fix
+git update-index --again
