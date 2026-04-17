@@ -14,7 +14,8 @@
     "quality": "pnpm run --stream '/^(lint|format)$/'",
     "quality:fix": "pnpm run --stream '/^(lint:fix|format:fix)$/'",
     "f": "pnpm --filter",
-    "cleanup": "rimraf --glob \"**/{.cache,.turbo,.output,.tanstack,.nitro,dist,node_modules}\""
+    "cleanup": "rimraf --glob \"**/{.cache,.turbo,.output,.tanstack,.nitro,dist,node_modules}\"",
+    "prepare": "husky"
   },
   "dependencies": {
     "@t3-oss/env-core": "^0.13.11",
