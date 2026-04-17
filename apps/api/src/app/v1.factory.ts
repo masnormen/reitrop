@@ -10,7 +10,6 @@ import { z } from "zod";
 import type { ExtractEnv } from "@/types/index";
 
 import { env } from "@/env";
-import { auth } from "@/lib/auth";
 import { ApiError } from "@/lib/error";
 import { pinoLogger } from "@/lib/logger";
 
@@ -34,6 +33,24 @@ const v1DefaultHook = <TContext extends Context>(
   }
 };
 
+type User = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type Session = {
+  id: string;
+  userId: string;
+  createdAt: string;
+  expiresAt: string;
+};
+
 export const createV1App = () => {
   const baseApp = new OpenAPIHono({
     defaultHook: v1DefaultHook,
@@ -53,20 +70,39 @@ export const createV1App = () => {
         credentials: true,
       }),
     )
-    .on(["POST", "GET"], "/auth/*", (c) => {
-      return auth.handler(c.req.raw);
-    })
     .use(
       "*",
       createMiddleware<{
-        Variables: {
-          user: typeof auth.$Infer.Session.user | null;
-          session: typeof auth.$Infer.Session.session | null;
-        };
+        Variables:
+          | {
+              user: User;
+              session: Session;
+            }
+          | {
+              user: null;
+              session: null;
+            };
       }>(async (c, next) => {
-        const session = await auth.api.getSession({
-          headers: c.req.raw.headers,
-        });
+        // TODO: Implement real authentication logic.
+        const session = {
+          user: {
+            id: "123",
+            name: "John Doe",
+            email: "john.doe@example.com",
+            phone: "123-456-7890",
+            role: "user",
+            status: "active",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          session: {
+            id: "456",
+            userId: "123",
+            createdAt: new Date().toISOString(),
+            expiresAt: new Date(Date.now() + 3600000).toISOString(), // 1 hour from now
+          },
+        };
+
         if (!session) {
           c.set("user", null);
           c.set("session", null);

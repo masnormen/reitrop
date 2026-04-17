@@ -3,7 +3,6 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 
 import { createV1App } from "@/app/v1.factory";
 import { env } from "@/env";
-import { pool } from "@/lib/db";
 import { setupCatchError } from "@/lib/error";
 import { pinoInstance } from "@/lib/logger";
 import { setupOpenAPI } from "@/lib/openapi";
@@ -35,13 +34,9 @@ const gracefulShutdown = () => {
   server.close((err: unknown) => {
     if (err) {
       pinoInstance.error(err);
-      void pool.end().finally(() => {
-        process.exit(1);
-      });
+      process.exit(1);
     }
-    void pool.end().finally(() => {
-      process.exit(0);
-    });
+    process.exit(0);
   });
 };
 

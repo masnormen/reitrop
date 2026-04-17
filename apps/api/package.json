@@ -13,8 +13,6 @@
   "dependencies": {
     "@hono/node-server": "1.19.13",
     "@hono/zod-openapi": "1.2.4",
-    "@repo/auth": "workspace:*",
-    "@repo/db": "workspace:*",
     "@scalar/hono-api-reference": "0.10.7",
     "hono": "4.12.12",
     "hono-pino": "0.10.3",
