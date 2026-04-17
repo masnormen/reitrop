@@ -2,7 +2,7 @@
 
 import type { AxiosError } from "axios";
 
-import { type DefaultError, queryOptions } from "@tanstack/react-query";
+import { type DefaultError, queryOptions, type UseMutationOptions } from "@tanstack/react-query";
 
 import type {
   GetApiV1MiscStatusData,
@@ -10,10 +10,42 @@ import type {
   GetApiV1MiscStatusWithParamsData,
   GetApiV1MiscStatusWithParamsError,
   GetApiV1MiscStatusWithParamsResponse,
+  PostApiV1AuthLoginData,
+  PostApiV1AuthLoginError,
+  PostApiV1AuthLoginResponse,
 } from "../types.gen";
 
 import { client } from "../client.gen";
-import { MiscService, type Options } from "../sdk.gen";
+import { AuthService, MiscService, type Options } from "../sdk.gen";
+
+/**
+ * Login with email and password
+ *
+ * Authenticate user and set httpOnly session cookie
+ */
+export const postApiV1AuthLoginMutation = (
+  options?: Partial<Options<PostApiV1AuthLoginData>>,
+): UseMutationOptions<
+  PostApiV1AuthLoginResponse,
+  AxiosError<PostApiV1AuthLoginError>,
+  Options<PostApiV1AuthLoginData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PostApiV1AuthLoginResponse,
+    AxiosError<PostApiV1AuthLoginError>,
+    Options<PostApiV1AuthLoginData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await AuthService.postApiV1AuthLogin({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export type QueryKey<TOptions extends Options> = [
   Pick<TOptions, "baseURL" | "body" | "headers" | "path" | "query"> & {

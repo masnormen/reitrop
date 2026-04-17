@@ -48,6 +48,6 @@ export const miscRoutes = createV1RouteApp()
       },
     }),
     async (c) => {
-      return c.json(okRes("ok", c.var.requestId), 200);
+      return c.json(okRes("ok", c.var.requestId), HttpStatusCodes.OK);
     },
   );

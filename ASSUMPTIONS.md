@@ -12,6 +12,7 @@ Since I have no access to the complete API schema of https://portier-takehometes
 ```
 
 Assumed schema:
+
 ```
 GET /api/v1/data/sync
 

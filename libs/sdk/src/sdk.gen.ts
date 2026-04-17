@@ -9,10 +9,13 @@ import type {
   GetApiV1MiscStatusWithParamsData,
   GetApiV1MiscStatusWithParamsErrors,
   GetApiV1MiscStatusWithParamsResponses,
+  PostApiV1AuthLoginData,
+  PostApiV1AuthLoginErrors,
+  PostApiV1AuthLoginResponses,
 } from "./types.gen";
 
 import { client } from "./client.gen";
-import { zGetApiV1MiscStatusWithParamsQuery } from "./zod.gen";
+import { zGetApiV1MiscStatusWithParamsQuery, zPostApiV1AuthLoginBody } from "./zod.gen";
 
 export type Options<
   TData extends TDataShape = TDataShape,
@@ -31,6 +34,39 @@ export type Options<
    */
   meta?: Record<string, unknown>;
 };
+
+export class AuthService {
+  /**
+   * Login with email and password
+   *
+   * Authenticate user and set httpOnly session cookie
+   */
+  public static postApiV1AuthLogin<ThrowOnError extends boolean = false>(
+    options: Options<PostApiV1AuthLoginData, ThrowOnError>,
+  ) {
+    return (options.client ?? client).post<
+      PostApiV1AuthLoginResponses,
+      PostApiV1AuthLoginErrors,
+      ThrowOnError
+    >({
+      requestValidator: async (data) =>
+        await z
+          .object({
+            body: zPostApiV1AuthLoginBody,
+            path: z.never().optional(),
+            query: z.never().optional(),
+          })
+          .parseAsync(data),
+      responseType: "json",
+      url: "/api/v1/auth/login",
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    });
+  }
+}
 
 export class MiscService {
   /**

@@ -29,6 +29,37 @@ export const zErrorResponse = z.object({
   requestId: z.string(),
 });
 
+export const zPostApiV1AuthLoginBody = z.object({
+  email: z.email(),
+  password: z.string(),
+});
+
+/**
+ * A successful response object
+ */
+export const zPostApiV1AuthLoginResponse = z.object({
+  ok: z.literal(true),
+  data: z.object({
+    session: z.object({
+      id: z.string(),
+      user: z.object({
+        id: z.string(),
+        name: z.string(),
+        email: z.email(),
+        phone: z.string(),
+        role: z.string(),
+        status: z.string(),
+        createdAt: z.string(),
+        updatedAt: z.string(),
+      }),
+      createdAt: z.string(),
+      expiresAt: z.string(),
+    }),
+  }),
+  message: z.enum(["Success"]),
+  requestId: z.string(),
+});
+
 /**
  * A successful response object
  */

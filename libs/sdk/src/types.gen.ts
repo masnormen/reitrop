@@ -54,6 +54,127 @@ export type ErrorResponse = {
   requestId: string;
 };
 
+export type PostApiV1AuthLoginData = {
+  body: {
+    email: string;
+    password: string;
+  };
+  path?: never;
+  query?: never;
+  url: "/api/v1/auth/login";
+};
+
+export type PostApiV1AuthLoginErrors = {
+  /**
+   * An error response object
+   */
+  400: {
+    /**
+     * Whether the response indicates success
+     */
+    ok: false;
+    /**
+     * Specific error code
+     */
+    errorCode: "MALFORMED_INPUT";
+    /**
+     * Human-readable error message
+     */
+    message: string;
+    /**
+     * Unique ID of the request
+     */
+    requestId: string;
+  };
+  /**
+   * An error response object
+   */
+  401: {
+    /**
+     * Whether the response indicates success
+     */
+    ok: false;
+    /**
+     * Specific error code
+     */
+    errorCode: "UNAUTHORIZED";
+    /**
+     * Human-readable error message
+     */
+    message: string;
+    /**
+     * Unique ID of the request
+     */
+    requestId: string;
+  };
+  /**
+   * An error response object
+   */
+  500: {
+    /**
+     * Whether the response indicates success
+     */
+    ok: false;
+    /**
+     * Specific error code
+     */
+    errorCode: "INTERNAL_SERVER_ERROR";
+    /**
+     * Human-readable error message
+     */
+    message: "Something went wrong. Please try again later.";
+    /**
+     * Unique ID of the request
+     */
+    requestId: string;
+  };
+};
+
+export type PostApiV1AuthLoginError = PostApiV1AuthLoginErrors[keyof PostApiV1AuthLoginErrors];
+
+export type PostApiV1AuthLoginResponses = {
+  /**
+   * A successful response object
+   */
+  200: {
+    /**
+     * Whether the response indicates success
+     */
+    ok: true;
+    /**
+     * The response data
+     */
+    data: {
+      session: {
+        id: string;
+        user: {
+          id: string;
+          name: string;
+          email: string;
+          phone: string;
+          role: string;
+          status: string;
+          createdAt: string;
+          updatedAt: string;
+        };
+        createdAt: string;
+        expiresAt: string;
+      };
+    };
+    /**
+     * Human-readable status message of the response
+     */
+    message: "Success";
+    /**
+     * Unique ID of the request
+     */
+    requestId: string;
+  };
+};
+
+export type PostApiV1AuthLoginResponse =
+  PostApiV1AuthLoginResponses[keyof PostApiV1AuthLoginResponses];
+
 export type GetApiV1MiscStatusData = {
   body?: never;
   path?: never;

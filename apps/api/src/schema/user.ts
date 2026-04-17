@@ -14,7 +14,7 @@ export type User = z.infer<typeof User>;
 
 export const Session = z.object({
   id: z.string(),
-  userId: z.string(),
+  user: User,
   createdAt: z.string(),
   expiresAt: z.string(),
 });

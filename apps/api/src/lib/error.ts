@@ -134,10 +134,10 @@ export const API_ERROR_DICTIONARY = {
     status: HttpStatusCodes.NOT_FOUND,
     message: "Requested resource was not found.",
   },
-  UNAUTHORIZED: {
+  UNAUTHORIZED: ({ message }: { message?: string } = {}) => ({
     status: HttpStatusCodes.UNAUTHORIZED,
-    message: "Missing user session. Please log in!",
-  },
+    message: message ?? "Missing user session. Please log in!",
+  }),
   FORBIDDEN: {
     status: HttpStatusCodes.FORBIDDEN,
     message: "You do not have enough permission to perform this action.",

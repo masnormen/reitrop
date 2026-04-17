@@ -6,9 +6,10 @@ import { env } from "@/env";
 import { setupCatchError } from "@/lib/error";
 import { pinoInstance } from "@/lib/logger";
 import { setupOpenAPI } from "@/lib/openapi";
+import { authRoutes } from "@/modules/auth/index";
 import { miscRoutes } from "@/modules/misc/index";
 
-const v1App = createV1App().route("/misc", miscRoutes);
+const v1App = createV1App().route("/auth", authRoutes).route("/misc", miscRoutes);
 
 export const app = new OpenAPIHono().basePath("/api").route("/v1", v1App);
 
