@@ -2,6 +2,7 @@
   "name": "starter",
   "private": true,
   "scripts": {
+    "setup-project": "tsx scripts/setup-project.ts",
     "build": "turbo run build",
     "dev": "turbo run dev",
     "dev:compose:up": "docker compose -f ./docker-compose.dev.yml up",

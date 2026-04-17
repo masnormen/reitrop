@@ -1,6 +1,8 @@
-# Starter
+# Reitrop
 
-README with setup steps (DB migration, seed data, login accounts per role)
+(read in reverse)
+
+README with setup steps:
 
 ### Setup
 
@@ -10,19 +12,10 @@ README with setup steps (DB migration, seed data, login accounts per role)
 pnpm install
 ```
 
-- Fill in your `.env` file based on the `.env.example` file
-
-### DB - Generate & Migrate
+- Fill in your `.env` file based on the `.env.example` file (I already have a script to do that for you).
 
 ```bash
-turbo db:migrate
-turbo db:generate
-```
-
-### DB - Seed Data
-
-```bash
-turbo db:seed
+pnpm setup-project
 ```
 
 ### Run development server
@@ -30,4 +23,18 @@ turbo db:seed
 ```bash
 pnpm install
 pnpm dev
+```
+
+### Run Docker build
+
+```bash
+docker build -f apps/api/Dockerfile . --progress=plain -t starter-api
+docker build -f apps/web/Dockerfile . --progress=plain -t starter-web
+```
+
+### Running built Docker images
+
+```bash
+docker run -p 4200:4200 starter-api
+docker run -p 3000:3000 starter-web
 ```
