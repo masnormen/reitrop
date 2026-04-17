@@ -1,0 +1,50 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "arrowParens": "always",
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "endOfLine": "lf",
+  "htmlWhitespaceSensitivity": "css",
+  "insertFinalNewline": true,
+  "jsxSingleQuote": false,
+  "printWidth": 100,
+  "proseWrap": "preserve",
+  "quoteProps": "as-needed",
+  "semi": true,
+  "singleAttributePerLine": false,
+  "singleQuote": false,
+  "tabWidth": 2,
+  "trailingComma": "all",
+  "useTabs": false,
+  "sortImports": {
+    "ignoreCase": true,
+    "newlinesBetween": true,
+    "specialCharacters": "trim",
+    "order": "asc",
+    "groups": [
+      "type-import",
+      ["value-builtin", "value-external"],
+      "type-internal",
+      "value-internal",
+      ["type-parent", "type-sibling", "type-index"],
+      ["value-parent", "value-sibling", "value-index"],
+      "unknown"
+    ]
+  },
+  "sortTailwindcss": {
+    "stylesheet": "./configs/tailwind/src/style.css",
+    "attributes": ["class", "className"],
+    "functions": ["clsx", "cn", "cx"],
+    "preserveWhitespace": true
+  },
+  "ignorePatterns": [
+    "**/node_modules",
+    "**/.next",
+    "**/dist",
+    "**/build",
+    "**/generated",
+    "**/*.gen.ts",
+    "!libs/sdk/**/*.gen.ts",
+    "pnpm-lock.yaml"
+  ]
+}

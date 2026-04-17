@@ -1,0 +1,46 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "import", "jsx-a11y", "node", "unicorn"],
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "ignorePatterns": [
+    "**/node_modules",
+    "**/.next",
+    "**/dist",
+    "**/build",
+    "**/generated",
+    "**/*.gen.ts"
+  ],
+  "settings": {
+    "react": {
+      "version": "19"
+    }
+  },
+  "rules": {
+    "eqeqeq": ["error", "always", { "null": "never" }],
+    "no-unused-vars": "error",
+    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "react/jsx-no-target-blank": "warn",
+    "react/jsx-key": "error",
+    "react/no-children-prop": "error",
+    "react/no-danger-with-children": "error",
+    "react/no-unescaped-entities": "warn",
+    "jsx-a11y/anchor-is-valid": "warn",
+    "import/no-cycle": "error",
+    "import/no-duplicates": "error",
+    "unicorn/no-new-array": "off",
+    "no-process-env": "error"
+  },
+  "overrides": [
+    {
+      "files": ["*.test.ts", "*.test.tsx", "*.spec.ts", "*.spec.tsx"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off"
+      }
+    }
+  ]
+}

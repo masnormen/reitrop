@@ -1,0 +1,78 @@
+{
+  "js/ts.preferences.importModuleSpecifier": "non-relative",
+  "js/ts.preferences.importModuleSpecifierEnding": "index",
+  "js/ts.updateImportsOnFileMove.enabled": "always",
+
+  // Exclude lockfiles and generated files from search
+  "search.exclude": {
+    "pnpm-lock.yaml": true,
+    "**.gen.ts": true
+  },
+  "editor.codeActions.triggerOnFocusChange": true,
+
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "always"
+  },
+
+  // Use Oxc extension for formatting and linting
+  "oxc.fmt.configPath": ".oxfmtrc.json",
+  "oxc.typeAware": true,
+  "oxc.unusedDisableDirectives": "warn",
+
+  "[json]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.oxc": "always"
+    }
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.oxc": "always"
+    }
+  },
+  "[jsonl]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.oxc": "always"
+    }
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.oxc": "always"
+    }
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.oxc": "always"
+    }
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.oxc": "always"
+    }
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.oxc": "always"
+    }
+  },
+  "[css][scss][postcss]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.oxc": "always"
+    }
+  },
+
+  // Other
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "js/ts.tsdk.path": "node_modules/typescript/lib"
+}

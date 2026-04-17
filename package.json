@@ -1,0 +1,48 @@
+{
+  "name": "starter",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "dev:compose:up": "docker compose -f ./docker-compose.dev.yml up",
+    "start": "turbo run start",
+    "lint": "oxlint --type-aware --type-check",
+    "lint:fix": "oxlint --fix --type-aware --type-check",
+    "format": "oxfmt --check",
+    "format:fix": "oxfmt",
+    "quality": "pnpm run --stream '/^(lint|format)$/'",
+    "quality:fix": "pnpm run --stream '/^(lint:fix|format:fix)$/'",
+    "f": "pnpm --filter",
+    "cleanup": "rimraf --glob \"**/{.cache,.turbo,.output,.tanstack,.nitro,dist,node_modules}\""
+  },
+  "dependencies": {
+    "@t3-oss/env-core": "^0.13.11",
+    "es-toolkit": "^1.45.1"
+  },
+  "devDependencies": {
+    "@dotenvx/dotenvx": "1.61.0",
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "oxfmt": "0.44.0",
+    "oxlint": "1.59.0",
+    "oxlint-tsgolint": "0.20.0",
+    "rimraf": "^6.1.3",
+    "tsx": "4.21.0",
+    "turbo": "2.9.6",
+    "typescript": "6.0.2"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "@tailwindcss/oxide",
+      "@parcel/watcher"
+    ],
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://v2-9-6.turborepo.dev/schema.json",
+  "ui": "tui",
+  "noUpdateNotifier": true,
+  "envMode": "loose",
+  "tasks": {
+    "dev": {
+      "dependsOn": ["^dev"],
+      "cache": false,
+      "persistent": true
+    },
+    "api#dev": {
+      "with": ["//#dev:compose:up"],
+      "cache": false,
+      "persistent": true
+    },
+    "web#dev": {
+      "with": ["@repo/sdk#sdk:generate:watch"],
+      "cache": false,
+      "persistent": true
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["dist/**", ".output/**"],
+      "env": ["APP_ENV", "API_PORT", "PORT", "DATABASE_URL", "AUTH_SECRET"]
+    },
+    "start": {
+      "dependsOn": ["^start"]
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "lint:fix": {
+      "dependsOn": ["^lint:fix"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "outputs": [".cache/tsbuildinfo.json"]
+    },
+    "sdk:generate:watch": {
+      "persistent": true
+    },
+    "sdk:generate": {
+      "env": ["OPENAPI_URL"]
+    },
+    "db:generate": {
+      "dependsOn": ["^db:generate"],
+      "env": ["DATABASE_URL"]
+    },
+    "db:migrate": {
+      "dependsOn": ["^db:migrate"],
+      "env": ["DATABASE_URL"]
+    },
+    "db:seed": {
+      "dependsOn": ["^db:seed"],
+      "env": ["DATABASE_URL", "API_AUTH_URL", "AUTH_SECRET"]
+    },
+    "db:studio": {},
+    "//#dev:compose:up": {},
+    "//#lint": {},
+    "//#lint:fix": {},
+    "//#format": {},
+    "//#format:fix": {},
+    "//#quality": {},
+    "//#quality:fix": {}
+  }
+}

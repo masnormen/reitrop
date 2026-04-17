@@ -1,0 +1,27 @@
+{
+  "name": "@repo/sdk",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./client": "./src/client.gen.ts",
+    "./sdk": "./src/sdk.gen.ts",
+    "./types": "./src/types.gen.ts",
+    "./zod": "./src/zod.gen.ts",
+    "./query": "./src/@tanstack/react-query.gen.ts"
+  },
+  "scripts": {
+    "sdk:generate:watch": "dotenvx run --convention=nextjs -- tsx watch gen-sdk.ts --watch",
+    "sdk:generate": "dotenvx run --convention=nextjs -- tsx gen-sdk.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.99.0",
+    "axios": "^1.15.0",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "0.95.0",
+    "@repo/tsconfig": "workspace:*"
+  }
+}
