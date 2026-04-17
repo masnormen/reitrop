@@ -20,7 +20,7 @@ export default defineConfig({
     __BUILD_SHA__: JSON.stringify(process.env.VITE_BUILD_SHA || "dev"),
   },
   resolve: {
-    tsconfigPaths: true
+    tsconfigPaths: true,
   },
   plugins: [
     tanstackStart(),

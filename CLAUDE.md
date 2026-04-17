@@ -36,7 +36,6 @@ pnpm start            # Start production builds
 turbo db:generate     # Generate Drizzle migrations from schema changes
 turbo db:migrate      # Run database migrations
 turbo db:studio       # Open Drizzle Studio (database GUI)
-turbo db:seed         # Seed database with initial data
 ```
 
 ### SDK Generation
@@ -86,7 +85,6 @@ starter/
 │   ├── tsconfig/    # Shared TypeScript configs
 │   └── tailwind/    # Tailwind CSS setup
 └── tools/
-    └── seed/        # Database seeding scripts
 ```
 
 ### API Architecture (`apps/api/`)

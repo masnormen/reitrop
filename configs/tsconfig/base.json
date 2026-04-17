@@ -4,11 +4,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "target": "ES2022",
-    "lib": [
-      "es2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["es2022", "DOM", "DOM.Iterable"],
     "allowJs": true,
     "resolveJsonModule": true,
     "moduleDetection": "force",
@@ -25,10 +21,5 @@
     "disableSourceOfProjectReferenceRedirect": true,
     "tsBuildInfoFile": "${configDir}/.cache/tsbuildinfo.json"
   },
-  "exclude": [
-    "node_modules",
-    "build",
-    "dist",
-    ".output"
-  ]
+  "exclude": ["node_modules", "build", "dist", ".output"]
 }
