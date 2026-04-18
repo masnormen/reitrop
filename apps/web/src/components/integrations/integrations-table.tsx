@@ -1,7 +1,7 @@
 import type { Integration } from "@repo/sdk/types";
 import type { ColumnDef } from "@tanstack/react-table";
 
-import { getApiV1ApplicationsListOptions } from "@repo/sdk/query";
+import { getApiV1DataListOptions } from "@repo/sdk/query";
 import { useQuery } from "@tanstack/react-query";
 import { useDebounce } from "ahooks";
 import { useState } from "react";
@@ -81,7 +81,7 @@ export function IntegrationsTable({ initialSearch }: IntegrationsTableProps) {
   const debouncedSearchQuery = useDebounce(searchQuery, { wait: 500 });
 
   const { data: response, isLoading } = useQuery({
-    ...getApiV1ApplicationsListOptions({
+    ...getApiV1DataListOptions({
       query: {
         search: debouncedSearchQuery || undefined,
       },

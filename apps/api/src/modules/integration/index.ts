@@ -2,8 +2,10 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { jsonContentRequired } from "stoker/openapi/helpers";
 
 import { createV1RouteApp } from "@/app/v1.factory";
+import { okRes, zOkRes } from "@/lib/response";
 import { HttpStatusCodes } from "@/lib/status-code";
-import { SyncErrorResponse, SyncResponse } from "@/schema/data-sync";
+import { INTEGRATIONS } from "@/mock";
+import { Integration, SyncData } from "@/schema/integrations";
 
 const EXTERNAL_API_URL = "https://portier-takehometest.onrender.com/api/v1/data/sync";
 
@@ -11,7 +13,59 @@ const SyncQuerySchema = z.object({
   application_id: z.enum(["salesforce", "hubspot", "stripe", "slack", "zendesk", "intercom"]),
 });
 
-const dataRoutes = createV1RouteApp()
+const SyncResponse = z.object({
+  code: z.string(),
+  message: z.string(),
+  data: SyncData,
+});
+
+const SyncErrorResponse = z.object({
+  code: z.string(),
+  message: z.string(),
+  error: z.string(),
+});
+
+const IntegrationListResponseSchema = z.array(Integration);
+
+const integrationRoutes = createV1RouteApp()
+  /**
+   * Get Applications List
+   */
+  .openapi(
+    createRoute({
+      tags: ["Integrations"],
+      summary: "Get Integrations List",
+      description: "Get list of all integrations with their sync status",
+      method: "get",
+      path: "/list",
+      request: {
+        query: z.object({
+          search: z.string().optional(),
+        }),
+      },
+      responses: {
+        [HttpStatusCodes.OK]: jsonContentRequired(
+          zOkRes(IntegrationListResponseSchema),
+          "Returns list of integrations",
+        ),
+      },
+    }),
+    async (c) => {
+      const { search } = c.req.valid("query");
+
+      let filteredIntegrations = INTEGRATIONS;
+      if (search) {
+        const query = search.toLowerCase();
+        filteredIntegrations = INTEGRATIONS.filter(
+          (integration) =>
+            integration.name.toLowerCase().includes(query) ||
+            integration.id.toLowerCase().includes(query),
+        );
+      }
+
+      return c.json(okRes(filteredIntegrations, c.var.requestId), HttpStatusCodes.OK);
+    },
+  )
   /**
    * Get Data Sync
    */
@@ -59,4 +113,4 @@ const dataRoutes = createV1RouteApp()
     },
   );
 
-export default dataRoutes;
+export default integrationRoutes;

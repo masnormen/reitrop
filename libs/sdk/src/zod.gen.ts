@@ -47,6 +47,8 @@ export const zUser = z.object({
   updatedAt: z.string(),
 });
 
+export const zChangeType = z.enum(["ADD", "UPDATE", "DELETE"]);
+
 export const zIntegration = z.object({
   id: z.string(),
   name: z.string(),
@@ -54,6 +56,43 @@ export const zIntegration = z.object({
   status: z.enum(["synced", "syncing", "conflict", "error"]),
   lastSyncedAt: z.string(),
   version: z.string(),
+});
+
+export const zSyncApproval = z.object({
+  application_name: z.string(),
+  changes: z.array(
+    z.object({
+      id: z.string(),
+      field_name: z.string(),
+      change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
+      current_value: z.string().optional(),
+      new_value: z.string().optional(),
+    }),
+  ),
+});
+
+export const zSyncChange = z.object({
+  id: z.string(),
+  field_name: z.string(),
+  change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
+  current_value: z.string().optional(),
+  new_value: z.string().optional(),
+});
+
+export const zSyncData = z.object({
+  sync_approval: z.object({
+    application_name: z.string(),
+    changes: z.array(
+      z.object({
+        id: z.string(),
+        field_name: z.string(),
+        change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
+        current_value: z.string().optional(),
+        new_value: z.string().optional(),
+      }),
+    ),
+  }),
+  metadata: z.record(z.string(), z.unknown()),
 });
 
 export const zSyncStatus = z.enum(["synced", "syncing", "conflict", "error"]);
@@ -151,14 +190,14 @@ export const zGetApiV1MiscStatusWithParamsResponse = z.object({
   requestId: z.string(),
 });
 
-export const zGetApiV1ApplicationsListQuery = z.object({
+export const zGetApiV1DataListQuery = z.object({
   search: z.string().optional(),
 });
 
 /**
  * A successful response object
  */
-export const zGetApiV1ApplicationsListResponse = z.object({
+export const zGetApiV1DataListResponse = z.object({
   ok: z.literal(true),
   data: z.array(
     z.object({

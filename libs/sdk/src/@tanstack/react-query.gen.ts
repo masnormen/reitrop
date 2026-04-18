@@ -5,11 +5,11 @@ import type { AxiosError } from "axios";
 import { type DefaultError, queryOptions, type UseMutationOptions } from "@tanstack/react-query";
 
 import type {
-  GetApiV1ApplicationsListData,
-  GetApiV1ApplicationsListResponse,
   GetApiV1AuthMeData,
   GetApiV1AuthMeError,
   GetApiV1AuthMeResponse,
+  GetApiV1DataListData,
+  GetApiV1DataListResponse,
   GetApiV1DataSyncData,
   GetApiV1DataSyncError,
   GetApiV1DataSyncResponse,
@@ -25,9 +25,9 @@ import type {
 
 import { client } from "../client.gen";
 import {
-  ApplicationsService,
   AuthService,
   DataService,
+  IntegrationsService,
   MiscService,
   type Options,
 } from "../sdk.gen";
@@ -184,23 +184,23 @@ export const getApiV1MiscStatusWithParamsOptions = (
     queryKey: getApiV1MiscStatusWithParamsQueryKey(options),
   });
 
-export const getApiV1ApplicationsListQueryKey = (options?: Options<GetApiV1ApplicationsListData>) =>
-  createQueryKey("getApiV1ApplicationsList", options, false, ["Applications"]);
+export const getApiV1DataListQueryKey = (options?: Options<GetApiV1DataListData>) =>
+  createQueryKey("getApiV1DataList", options, false, ["Integrations"]);
 
 /**
- * Get Applications List
+ * Get Integrations List
  *
- * Get list of all applications with their sync status
+ * Get list of all integrations with their sync status
  */
-export const getApiV1ApplicationsListOptions = (options?: Options<GetApiV1ApplicationsListData>) =>
+export const getApiV1DataListOptions = (options?: Options<GetApiV1DataListData>) =>
   queryOptions<
-    GetApiV1ApplicationsListResponse,
+    GetApiV1DataListResponse,
     AxiosError<DefaultError>,
-    GetApiV1ApplicationsListResponse,
-    ReturnType<typeof getApiV1ApplicationsListQueryKey>
+    GetApiV1DataListResponse,
+    ReturnType<typeof getApiV1DataListQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await ApplicationsService.getApiV1ApplicationsList({
+      const { data } = await IntegrationsService.getApiV1DataList({
         ...options,
         ...queryKey[0],
         signal,
@@ -208,7 +208,7 @@ export const getApiV1ApplicationsListOptions = (options?: Options<GetApiV1Applic
       });
       return data;
     },
-    queryKey: getApiV1ApplicationsListQueryKey(options),
+    queryKey: getApiV1DataListQueryKey(options),
   });
 
 export const getApiV1DataSyncQueryKey = (options: Options<GetApiV1DataSyncData>) =>

@@ -53,6 +53,8 @@ export type User = {
   updatedAt: string;
 };
 
+export type ChangeType = "ADD" | "UPDATE" | "DELETE";
+
 export type Integration = {
   id: string;
   name: string;
@@ -60,6 +62,41 @@ export type Integration = {
   status: "synced" | "syncing" | "conflict" | "error";
   lastSyncedAt: string;
   version: string;
+};
+
+export type SyncApproval = {
+  application_name: string;
+  changes: Array<{
+    id: string;
+    field_name: string;
+    change_type: "ADD" | "UPDATE" | "DELETE";
+    current_value?: string;
+    new_value?: string;
+  }>;
+};
+
+export type SyncChange = {
+  id: string;
+  field_name: string;
+  change_type: "ADD" | "UPDATE" | "DELETE";
+  current_value?: string;
+  new_value?: string;
+};
+
+export type SyncData = {
+  sync_approval: {
+    application_name: string;
+    changes: Array<{
+      id: string;
+      field_name: string;
+      change_type: "ADD" | "UPDATE" | "DELETE";
+      current_value?: string;
+      new_value?: string;
+    }>;
+  };
+  metadata: {
+    [key: string]: unknown;
+  };
 };
 
 export type SyncStatus = "synced" | "syncing" | "conflict" | "error";
@@ -422,16 +459,16 @@ export type GetApiV1MiscStatusWithParamsResponses = {
 export type GetApiV1MiscStatusWithParamsResponse =
   GetApiV1MiscStatusWithParamsResponses[keyof GetApiV1MiscStatusWithParamsResponses];
 
-export type GetApiV1ApplicationsListData = {
+export type GetApiV1DataListData = {
   body?: never;
   path?: never;
   query?: {
     search?: string;
   };
-  url: "/api/v1/applications/list";
+  url: "/api/v1/data/list";
 };
 
-export type GetApiV1ApplicationsListResponses = {
+export type GetApiV1DataListResponses = {
   /**
    * A successful response object
    */
@@ -462,8 +499,7 @@ export type GetApiV1ApplicationsListResponses = {
   };
 };
 
-export type GetApiV1ApplicationsListResponse =
-  GetApiV1ApplicationsListResponses[keyof GetApiV1ApplicationsListResponses];
+export type GetApiV1DataListResponse = GetApiV1DataListResponses[keyof GetApiV1DataListResponses];
 
 export type GetApiV1DataSyncData = {
   body?: never;
