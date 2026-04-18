@@ -5,13 +5,7 @@ import { createV1RouteApp } from "@/app/v1.factory";
 import { okRes, zOkRes } from "@/lib/response";
 import { HttpStatusCodes } from "@/lib/status-code";
 import { INTEGRATIONS } from "@/mock";
-import {
-  Integration,
-  ResolveRequest,
-  ResolveResponse,
-  SyncData,
-  SyncEvent,
-} from "@/schema/integrations";
+import { ApplicationId, Integration, SyncChange, SyncData, SyncEvent } from "@/schema/integrations";
 
 const EXTERNAL_API_URL = "https://portier-takehometest.onrender.com/api/v1/data/sync";
 
@@ -19,15 +13,13 @@ const EXTERNAL_API_URL = "https://portier-takehometest.onrender.com/api/v1/data/
 const SYNC_EVENTS = new Map<string, SyncEvent[]>();
 
 const SyncQuerySchema = z.object({
-  application_id: z.enum(["salesforce", "hubspot", "stripe", "slack", "zendesk", "intercom"]),
+  application_id: ApplicationId,
 });
-
 const SyncResponse = z.object({
   code: z.string(),
   message: z.string(),
   data: SyncData,
 });
-
 const SyncErrorResponse = z.object({
   code: z.string(),
   message: z.string(),
@@ -35,6 +27,13 @@ const SyncErrorResponse = z.object({
 });
 
 const IntegrationListResponseSchema = z.array(Integration);
+
+export const ResolveRequest = z.object({
+  syncChange: SyncChange,
+  action: z.enum(["approve", "reject"]),
+});
+
+export const ResolveResponse = SyncEvent;
 
 const integrationRoutes = createV1RouteApp()
   /**
@@ -204,7 +203,7 @@ const integrationRoutes = createV1RouteApp()
       path: "/{application_id}/resolve",
       request: {
         params: z.object({
-          application_id: z.string(),
+          application_id: ApplicationId,
         }),
         body: {
           content: {

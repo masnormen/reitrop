@@ -47,7 +47,9 @@ function RootComponent() {
     <RootDocument>
       <CatchBoundary getResetKey={() => "reset"}>
         <Navbar />
-        <Outlet />
+        <main className="bg-background mx-auto block min-h-screen w-full max-w-5xl pb-16">
+          <Outlet />
+        </main>
 
         {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
         {import.meta.env.DEV && <TanStackRouterDevtools initialIsOpen={false} />}

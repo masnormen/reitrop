@@ -11,7 +11,6 @@ export function getRouter() {
     routeTree,
     context: { ...rqContext },
     defaultPreload: "intent",
-    defaultStaleTime: Infinity,
     defaultHashScrollIntoView: true,
     scrollRestoration: true,
     scrollRestorationBehavior: "instant",

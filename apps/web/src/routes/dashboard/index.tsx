@@ -6,7 +6,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { IntegrationsTable } from "@/components/integrations/integrations-table";
 
-export const Route = createFileRoute("/dashboard")({
+export const Route = createFileRoute("/dashboard/")({
   ssr: false,
   loader: async ({ context }) => {
     try {

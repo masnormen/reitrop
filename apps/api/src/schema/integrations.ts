@@ -1,10 +1,20 @@
 import { z } from "zod";
 
+export const ApplicationId = z.enum([
+  "salesforce",
+  "hubspot",
+  "stripe",
+  "slack",
+  "zendesk",
+  "intercom",
+]);
+export type ApplicationId = z.infer<typeof ApplicationId>;
+
 export const SyncStatus = z.enum(["synced", "syncing", "conflict", "error"]);
 export type SyncStatus = z.infer<typeof SyncStatus>;
 
 export const Integration = z.object({
-  id: z.string(),
+  id: ApplicationId,
   name: z.string(),
   emoji: z.string(),
   status: SyncStatus,
@@ -45,19 +55,10 @@ export type SyncEventStatus = z.infer<typeof SyncEventStatus>;
 
 export const SyncEvent = SyncChange.extend({
   syncId: z.string(),
-  applicationId: z.string(),
+  applicationId: ApplicationId,
   timestamp: z.string(),
   status: SyncEventStatus,
   version: z.string(),
   resolvedBy: z.string(),
 });
 export type SyncEvent = z.infer<typeof SyncEvent>;
-
-export const ResolveRequest = z.object({
-  syncChange: SyncChange,
-  action: z.enum(["approve", "reject"]),
-});
-export type ResolveRequest = z.infer<typeof ResolveRequest>;
-
-export const ResolveResponse = SyncEvent;
-export type ResolveResponse = z.infer<typeof ResolveResponse>;

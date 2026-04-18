@@ -18,11 +18,8 @@ import type {
   GetApiV1DataSyncData,
   GetApiV1DataSyncError,
   GetApiV1DataSyncResponse,
-  GetApiV1MiscStatusData,
-  GetApiV1MiscStatusResponse,
-  GetApiV1MiscStatusWithParamsData,
-  GetApiV1MiscStatusWithParamsError,
-  GetApiV1MiscStatusWithParamsResponse,
+  GetApiV1MiscDebugData,
+  GetApiV1MiscDebugResponse,
   PostApiV1AuthLoginData,
   PostApiV1AuthLoginError,
   PostApiV1AuthLoginResponse,
@@ -128,23 +125,23 @@ export const getApiV1AuthMeOptions = (options?: Options<GetApiV1AuthMeData>) =>
     queryKey: getApiV1AuthMeQueryKey(options),
   });
 
-export const getApiV1MiscStatusQueryKey = (options?: Options<GetApiV1MiscStatusData>) =>
-  createQueryKey("getApiV1MiscStatus", options, false, ["Misc"]);
+export const getApiV1MiscDebugQueryKey = (options?: Options<GetApiV1MiscDebugData>) =>
+  createQueryKey("getApiV1MiscDebug", options, false, ["Misc"]);
 
 /**
- * Get Status
+ * Get Debug
  *
- * Get ok status
+ * Get debug info
  */
-export const getApiV1MiscStatusOptions = (options?: Options<GetApiV1MiscStatusData>) =>
+export const getApiV1MiscDebugOptions = (options?: Options<GetApiV1MiscDebugData>) =>
   queryOptions<
-    GetApiV1MiscStatusResponse,
+    GetApiV1MiscDebugResponse,
     AxiosError<DefaultError>,
-    GetApiV1MiscStatusResponse,
-    ReturnType<typeof getApiV1MiscStatusQueryKey>
+    GetApiV1MiscDebugResponse,
+    ReturnType<typeof getApiV1MiscDebugQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await MiscService.getApiV1MiscStatus({
+      const { data } = await MiscService.getApiV1MiscDebug({
         ...options,
         ...queryKey[0],
         signal,
@@ -152,37 +149,7 @@ export const getApiV1MiscStatusOptions = (options?: Options<GetApiV1MiscStatusDa
       });
       return data;
     },
-    queryKey: getApiV1MiscStatusQueryKey(options),
-  });
-
-export const getApiV1MiscStatusWithParamsQueryKey = (
-  options: Options<GetApiV1MiscStatusWithParamsData>,
-) => createQueryKey("getApiV1MiscStatusWithParams", options, false, ["Misc"]);
-
-/**
- * Get Status with Params
- *
- * Get ok status
- */
-export const getApiV1MiscStatusWithParamsOptions = (
-  options: Options<GetApiV1MiscStatusWithParamsData>,
-) =>
-  queryOptions<
-    GetApiV1MiscStatusWithParamsResponse,
-    AxiosError<GetApiV1MiscStatusWithParamsError>,
-    GetApiV1MiscStatusWithParamsResponse,
-    ReturnType<typeof getApiV1MiscStatusWithParamsQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await MiscService.getApiV1MiscStatusWithParams({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getApiV1MiscStatusWithParamsQueryKey(options),
+    queryKey: getApiV1MiscDebugQueryKey(options),
   });
 
 export const getApiV1DataListQueryKey = (options?: Options<GetApiV1DataListData>) =>

@@ -3,9 +3,11 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 import { getApiV1DataListOptions } from "@repo/sdk/query";
 import { useQuery } from "@tanstack/react-query";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useDebounce } from "ahooks";
 import { useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 
 interface IntegrationsTableProps {
@@ -66,17 +68,23 @@ const columns: ColumnDef<Integration>[] = [
   {
     id: "actions",
     header: () => <div className="text-right">Actions</div>,
-    cell: () => (
+    cell: ({ row }) => (
       <div className="text-right">
-        <button type="button" className="text-sm font-medium text-primary hover:underline">
-          View Details
-        </button>
+        <Link
+          type="button"
+          className="text-sm font-medium text-primary hover:underline"
+          to="/dashboard/$applicationId"
+          params={{ applicationId: row.original.id }}
+        >
+          <Button>View Details</Button>
+        </Link>
       </div>
     ),
   },
 ];
 
 export function IntegrationsTable({ initialSearch }: IntegrationsTableProps) {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState(initialSearch ?? "");
   const debouncedSearchQuery = useDebounce(searchQuery, { wait: 500 });
 
@@ -87,8 +95,6 @@ export function IntegrationsTable({ initialSearch }: IntegrationsTableProps) {
       },
     }),
   });
-
-  const integrations = response?.data ?? [];
 
   return (
     <div className="space-y-4">
@@ -120,9 +126,15 @@ export function IntegrationsTable({ initialSearch }: IntegrationsTableProps) {
 
       <DataTable
         columns={columns}
-        data={integrations}
+        data={response?.data || []}
         isLoading={isLoading}
         bodyRowOptions={{
+          onClick: (integration) => {
+            void navigate({
+              to: "/dashboard/$applicationId",
+              params: { applicationId: integration.id },
+            });
+          },
           className: "cursor-pointer",
         }}
       />

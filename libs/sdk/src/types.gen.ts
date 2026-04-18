@@ -53,42 +53,19 @@ export type User = {
   updatedAt: string;
 };
 
+export type ApplicationId = "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
+
 export type ChangeType = "ADD" | "UPDATE" | "DELETE";
 
 export type ConnectionStatus = "connected" | "disconnected" | "pending" | "error";
 
 export type Integration = {
-  id: string;
+  id: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
   name: string;
   emoji: string;
   status: "synced" | "syncing" | "conflict" | "error";
   lastSyncedAt: string;
   version: string;
-};
-
-export type ResolveRequest = {
-  syncChange: {
-    id: string;
-    field_name: string;
-    change_type: "ADD" | "UPDATE" | "DELETE";
-    current_value?: string;
-    new_value?: string;
-  };
-  action: "approve" | "reject";
-};
-
-export type ResolveResponse = {
-  id: string;
-  field_name: string;
-  change_type: "ADD" | "UPDATE" | "DELETE";
-  current_value?: string;
-  new_value?: string;
-  syncId: string;
-  applicationId: string;
-  timestamp: string;
-  status: "pending" | "approved" | "rejected" | "failed";
-  version: string;
-  resolvedBy: string;
 };
 
 export type SyncApproval = {
@@ -133,7 +110,7 @@ export type SyncEvent = {
   current_value?: string;
   new_value?: string;
   syncId: string;
-  applicationId: string;
+  applicationId: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
   timestamp: string;
   status: "pending" | "approved" | "rejected" | "failed";
   version: string;
@@ -384,14 +361,14 @@ export type GetApiV1AuthMeResponses = {
 
 export type GetApiV1AuthMeResponse = GetApiV1AuthMeResponses[keyof GetApiV1AuthMeResponses];
 
-export type GetApiV1MiscStatusData = {
+export type GetApiV1MiscDebugData = {
   body?: never;
   path?: never;
   query?: never;
-  url: "/api/v1/misc/status";
+  url: "/api/v1/misc/debug";
 };
 
-export type GetApiV1MiscStatusResponses = {
+export type GetApiV1MiscDebugResponses = {
   /**
    * A successful response object
    */
@@ -403,7 +380,7 @@ export type GetApiV1MiscStatusResponses = {
     /**
      * The response data
      */
-    data: "ok";
+    data?: unknown;
     /**
      * Human-readable status message of the response
      */
@@ -415,93 +392,8 @@ export type GetApiV1MiscStatusResponses = {
   };
 };
 
-export type GetApiV1MiscStatusResponse =
-  GetApiV1MiscStatusResponses[keyof GetApiV1MiscStatusResponses];
-
-export type GetApiV1MiscStatusWithParamsData = {
-  body?: never;
-  path?: never;
-  query: {
-    required: string;
-    optional?: string;
-  };
-  url: "/api/v1/misc/status-with-params";
-};
-
-export type GetApiV1MiscStatusWithParamsErrors = {
-  /**
-   * An error response object
-   */
-  400: {
-    /**
-     * Whether the response indicates success
-     */
-    ok: false;
-    /**
-     * Specific error code
-     */
-    errorCode: "MALFORMED_INPUT";
-    /**
-     * Human-readable error message
-     */
-    message: string;
-    /**
-     * Unique ID of the request
-     */
-    requestId: string;
-  };
-  /**
-   * An error response object
-   */
-  500: {
-    /**
-     * Whether the response indicates success
-     */
-    ok: false;
-    /**
-     * Specific error code
-     */
-    errorCode: "INTERNAL_SERVER_ERROR";
-    /**
-     * Human-readable error message
-     */
-    message: "Something went wrong. Please try again later.";
-    /**
-     * Unique ID of the request
-     */
-    requestId: string;
-  };
-};
-
-export type GetApiV1MiscStatusWithParamsError =
-  GetApiV1MiscStatusWithParamsErrors[keyof GetApiV1MiscStatusWithParamsErrors];
-
-export type GetApiV1MiscStatusWithParamsResponses = {
-  /**
-   * A successful response object
-   */
-  200: {
-    /**
-     * Whether the response indicates success
-     */
-    ok: true;
-    /**
-     * The response data
-     */
-    data: "ok";
-    /**
-     * Human-readable status message of the response
-     */
-    message: "Success";
-    /**
-     * Unique ID of the request
-     */
-    requestId: string;
-  };
-};
-
-export type GetApiV1MiscStatusWithParamsResponse =
-  GetApiV1MiscStatusWithParamsResponses[keyof GetApiV1MiscStatusWithParamsResponses];
+export type GetApiV1MiscDebugResponse =
+  GetApiV1MiscDebugResponses[keyof GetApiV1MiscDebugResponses];
 
 export type GetApiV1DataListData = {
   body?: never;
@@ -525,7 +417,7 @@ export type GetApiV1DataListResponses = {
      * The response data
      */
     data: Array<{
-      id: string;
+      id: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
       name: string;
       emoji: string;
       status: "synced" | "syncing" | "conflict" | "error";
@@ -629,7 +521,7 @@ export type GetApiV1DataByApplicationIdResponses = {
      * The response data
      */
     data: {
-      id: string;
+      id: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
       name: string;
       emoji: string;
       status: "synced" | "syncing" | "conflict" | "error";
@@ -678,7 +570,7 @@ export type GetApiV1DataByApplicationIdHistoryResponses = {
       current_value?: string;
       new_value?: string;
       syncId: string;
-      applicationId: string;
+      applicationId: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
       timestamp: string;
       status: "pending" | "approved" | "rejected" | "failed";
       version: string;
@@ -710,7 +602,7 @@ export type PostApiV1DataByApplicationIdResolveData = {
     action: "approve" | "reject";
   };
   path: {
-    application_id: string;
+    application_id: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
   };
   query?: never;
   url: "/api/v1/data/{application_id}/resolve";
@@ -735,7 +627,7 @@ export type PostApiV1DataByApplicationIdResolveResponses = {
       current_value?: string;
       new_value?: string;
       syncId: string;
-      applicationId: string;
+      applicationId: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
       timestamp: string;
       status: "pending" | "approved" | "rejected" | "failed";
       version: string;

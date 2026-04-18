@@ -17,11 +17,8 @@ import type {
   GetApiV1DataSyncData,
   GetApiV1DataSyncErrors,
   GetApiV1DataSyncResponses,
-  GetApiV1MiscStatusData,
-  GetApiV1MiscStatusResponses,
-  GetApiV1MiscStatusWithParamsData,
-  GetApiV1MiscStatusWithParamsErrors,
-  GetApiV1MiscStatusWithParamsResponses,
+  GetApiV1MiscDebugData,
+  GetApiV1MiscDebugResponses,
   PostApiV1AuthLoginData,
   PostApiV1AuthLoginErrors,
   PostApiV1AuthLoginResponses,
@@ -35,7 +32,6 @@ import {
   zGetApiV1DataByApplicationIdPath,
   zGetApiV1DataListQuery,
   zGetApiV1DataSyncQuery,
-  zGetApiV1MiscStatusWithParamsQuery,
   zPostApiV1AuthLoginBody,
   zPostApiV1DataByApplicationIdResolveBody,
   zPostApiV1DataByApplicationIdResolvePath,
@@ -121,14 +117,14 @@ export class AuthService {
 
 export class MiscService {
   /**
-   * Get Status
+   * Get Debug
    *
-   * Get ok status
+   * Get debug info
    */
-  public static getApiV1MiscStatus<ThrowOnError extends boolean = false>(
-    options?: Options<GetApiV1MiscStatusData, ThrowOnError>,
+  public static getApiV1MiscDebug<ThrowOnError extends boolean = false>(
+    options?: Options<GetApiV1MiscDebugData, ThrowOnError>,
   ) {
-    return (options?.client ?? client).get<GetApiV1MiscStatusResponses, unknown, ThrowOnError>({
+    return (options?.client ?? client).get<GetApiV1MiscDebugResponses, unknown, ThrowOnError>({
       requestValidator: async (data) =>
         await z
           .object({
@@ -138,34 +134,7 @@ export class MiscService {
           })
           .parseAsync(data),
       responseType: "json",
-      url: "/api/v1/misc/status",
-      ...options,
-    });
-  }
-
-  /**
-   * Get Status with Params
-   *
-   * Get ok status
-   */
-  public static getApiV1MiscStatusWithParams<ThrowOnError extends boolean = false>(
-    options: Options<GetApiV1MiscStatusWithParamsData, ThrowOnError>,
-  ) {
-    return (options.client ?? client).get<
-      GetApiV1MiscStatusWithParamsResponses,
-      GetApiV1MiscStatusWithParamsErrors,
-      ThrowOnError
-    >({
-      requestValidator: async (data) =>
-        await z
-          .object({
-            body: z.never().optional(),
-            path: z.never().optional(),
-            query: zGetApiV1MiscStatusWithParamsQuery,
-          })
-          .parseAsync(data),
-      responseType: "json",
-      url: "/api/v1/misc/status-with-params",
+      url: "/api/v1/misc/debug",
       ...options,
     });
   }
