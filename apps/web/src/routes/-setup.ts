@@ -1,5 +1,6 @@
 import { client } from "@repo/sdk/client";
 import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 
@@ -12,6 +13,7 @@ import { SESSION_JWT_STORAGE_KEY } from "@/atoms/index";
 const DEFAULT_TIMEZONE = "Asia/Jakarta";
 dayjs.extend(utc);
 dayjs.extend(timezone);
+dayjs.extend(relativeTime);
 dayjs.tz.setDefault(DEFAULT_TIMEZONE);
 
 // Configure SDK client

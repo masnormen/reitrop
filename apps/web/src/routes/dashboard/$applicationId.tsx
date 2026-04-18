@@ -6,7 +6,8 @@ import { getApiV1AuthMeOptions, getApiV1DataByApplicationIdOptions } from "@repo
 import { zApplicationId } from "@repo/sdk/zod";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import dayjs from "dayjs";
+import { ArrowLeft, RefreshCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -98,7 +99,9 @@ function IntegrationDetailContent({ applicationId }: { applicationId: Applicatio
                 <p className="text-sm text-muted-foreground">ID: {integration.data.id}</p>
               </div>
             </div>
-            <Button>Sync Now</Button>
+            <Button size="lg" className="font-bold">
+              <RefreshCcw /> Sync Now
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -120,7 +123,7 @@ function IntegrationDetailContent({ applicationId }: { applicationId: Applicatio
             <div>
               <p className="text-sm font-medium text-muted-foreground">Last Synced</p>
               <p className="mt-1 text-sm">
-                {new Date(integration.data.lastSyncedAt).toLocaleString()}
+                {dayjs(integration.data.lastSyncedAt).format("MMMM DD, YYYY HH:mm")}
               </p>
             </div>
           </div>
