@@ -13,7 +13,7 @@ import type { ExtractEnv } from "@/types/index";
 import { env } from "@/env";
 import { ApiError } from "@/lib/error";
 import { pinoLogger } from "@/lib/logger";
-import { Session } from "@/schema";
+import { Session } from "@/schema/auth";
 
 const v1DefaultHook = <TContext extends Context>(
   result:

@@ -4,6 +4,8 @@ import * as z from "zod";
 
 import type { Client, Options as Options2, TDataShape } from "./client";
 import type {
+  GetApiV1ApplicationsListData,
+  GetApiV1ApplicationsListResponses,
   GetApiV1AuthMeData,
   GetApiV1AuthMeErrors,
   GetApiV1AuthMeResponses,
@@ -145,6 +147,35 @@ export class MiscService {
           .parseAsync(data),
       responseType: "json",
       url: "/api/v1/misc/status-with-params",
+      ...options,
+    });
+  }
+}
+
+export class ApplicationsService {
+  /**
+   * Get Applications List
+   *
+   * Get list of all applications with their sync status
+   */
+  public static getApiV1ApplicationsList<ThrowOnError extends boolean = false>(
+    options?: Options<GetApiV1ApplicationsListData, ThrowOnError>,
+  ) {
+    return (options?.client ?? client).get<
+      GetApiV1ApplicationsListResponses,
+      unknown,
+      ThrowOnError
+    >({
+      requestValidator: async (data) =>
+        await z
+          .object({
+            body: z.never().optional(),
+            path: z.never().optional(),
+            query: z.never().optional(),
+          })
+          .parseAsync(data),
+      responseType: "json",
+      url: "/api/v1/applications/list",
       ...options,
     });
   }

@@ -47,6 +47,17 @@ export const zUser = z.object({
   updatedAt: z.string(),
 });
 
+export const zIntegration = z.object({
+  id: z.string(),
+  name: z.string(),
+  emoji: z.string(),
+  status: z.enum(["synced", "syncing", "conflict", "error"]),
+  lastSyncedAt: z.string(),
+  version: z.string(),
+});
+
+export const zSyncStatus = z.enum(["synced", "syncing", "conflict", "error"]);
+
 /**
  * An error response object
  */
@@ -136,6 +147,25 @@ export const zGetApiV1MiscStatusWithParamsQuery = z.object({
 export const zGetApiV1MiscStatusWithParamsResponse = z.object({
   ok: z.literal(true),
   data: z.enum(["ok"]),
+  message: z.enum(["Success"]),
+  requestId: z.string(),
+});
+
+/**
+ * A successful response object
+ */
+export const zGetApiV1ApplicationsListResponse = z.object({
+  ok: z.literal(true),
+  data: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      emoji: z.string(),
+      status: z.enum(["synced", "syncing", "conflict", "error"]),
+      lastSyncedAt: z.string(),
+      version: z.string(),
+    }),
+  ),
   message: z.enum(["Success"]),
   requestId: z.string(),
 });

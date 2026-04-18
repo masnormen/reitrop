@@ -9,7 +9,7 @@ import { ApiError } from "@/lib/error";
 import { errorContent, okRes, zOkRes } from "@/lib/response";
 import { HttpStatusCodes } from "@/lib/status-code";
 import { MOCK_USER } from "@/mock";
-import { Session, User } from "@/schema";
+import { Session, User } from "@/schema/auth";
 
 const LoginSchema = z.object({
   email: z.email(),

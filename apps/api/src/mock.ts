@@ -1,3 +1,5 @@
+import type { Integration } from "./schema/integrations";
+
 export const MOCK_USER = {
   id: "2998b136-c351-461e-a312-f8a8eed51f13",
   name: "John Doe",
@@ -8,3 +10,72 @@ export const MOCK_USER = {
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };
+
+// In-memory database for integrations
+// Edit this file to add/modify integrations
+export const INTEGRATIONS: Integration[] = [
+  {
+    id: "slack",
+    name: "Slack",
+    emoji: "💬",
+    status: "synced",
+    lastSyncedAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+    version: "20250118.01",
+  },
+  {
+    id: "salesforce",
+    name: "Salesforce",
+    emoji: "☁️",
+    status: "synced",
+    lastSyncedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+    version: "20250118.02",
+  },
+  {
+    id: "hubspot",
+    name: "HubSpot",
+    emoji: "🧲",
+    status: "conflict",
+    lastSyncedAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+    version: "20250118.01",
+  },
+  {
+    id: "stripe",
+    name: "Stripe",
+    emoji: "💳",
+    status: "synced",
+    lastSyncedAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
+    version: "20250118.03",
+  },
+  {
+    id: "github",
+    name: "GitHub",
+    emoji: "🐙",
+    status: "syncing",
+    lastSyncedAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
+    version: "20250118.01",
+  },
+  {
+    id: "notion",
+    name: "Notion",
+    emoji: "📝",
+    status: "error",
+    lastSyncedAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
+    version: "20250117.05",
+  },
+  {
+    id: "jira",
+    name: "Jira",
+    emoji: "📋",
+    status: "synced",
+    lastSyncedAt: new Date(Date.now() - 1000 * 60 * 240).toISOString(),
+    version: "20250118.01",
+  },
+  {
+    id: "linear",
+    name: "Linear",
+    emoji: "🚀",
+    status: "synced",
+    lastSyncedAt: new Date(Date.now() - 1000 * 60 * 300).toISOString(),
+    version: "20250118.02",
+  },
+];

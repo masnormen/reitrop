@@ -1,8 +1,10 @@
 "use client";
 
-import { getApiV1AuthMeOptions } from "@repo/sdk/query";
+import { getApiV1ApplicationsListOptions, getApiV1AuthMeOptions } from "@repo/sdk/query";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+
+import { IntegrationsTable } from "@/components/integrations/integrations-table";
 
 export const Route = createFileRoute("/dashboard")({
   ssr: false,
@@ -18,6 +20,9 @@ export const Route = createFileRoute("/dashboard")({
 
 function DashboardPage() {
   const { data: user } = useQuery({ ...getApiV1AuthMeOptions(), retry: false });
+  const { data: integrations, isLoading: isLoadingIntegrations } = useQuery({
+    ...getApiV1ApplicationsListOptions(),
+  });
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -26,7 +31,7 @@ function DashboardPage() {
         <p className="text-muted-foreground">Welcome back, {user?.data.name}!</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-lg border p-6">
           <h2 className="mb-2 text-lg font-semibold">Profile Information</h2>
           <div className="space-y-2 text-sm">
@@ -46,10 +51,35 @@ function DashboardPage() {
         </div>
 
         <div className="rounded-lg border p-6">
-          <h2 className="mb-2 text-lg font-semibold">Quick Actions</h2>
-          <p className="text-sm text-muted-foreground">More features coming soon...</p>
+          <h2 className="mb-2 text-lg font-semibold">Sync Status</h2>
+          <div className="space-y-2 text-sm">
+            <div>
+              <span className="font-medium">Total Integrations:</span>{" "}
+              {integrations?.data?.length ?? 0}
+            </div>
+            <div>
+              <span className="font-medium">Synced:</span>{" "}
+              {integrations?.data?.filter((i) => i.status === "synced").length}
+            </div>
+            <div>
+              <span className="font-medium">Conflicts:</span>{" "}
+              {integrations?.data?.filter((i) => i.status === "conflict").length}
+            </div>
+            <div>
+              <span className="font-medium">Errors:</span>{" "}
+              {integrations?.data?.filter((i) => i.status === "error").length}
+            </div>
+          </div>
         </div>
       </div>
+
+      {isLoadingIntegrations ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        </div>
+      ) : (
+        <IntegrationsTable integrations={integrations?.data ?? []} />
+      )}
     </div>
   );
 }

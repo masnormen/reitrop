@@ -53,6 +53,17 @@ export type User = {
   updatedAt: string;
 };
 
+export type Integration = {
+  id: string;
+  name: string;
+  emoji: string;
+  status: "synced" | "syncing" | "conflict" | "error";
+  lastSyncedAt: string;
+  version: string;
+};
+
+export type SyncStatus = "synced" | "syncing" | "conflict" | "error";
+
 /**
  * An error response object
  */
@@ -410,3 +421,44 @@ export type GetApiV1MiscStatusWithParamsResponses = {
 
 export type GetApiV1MiscStatusWithParamsResponse =
   GetApiV1MiscStatusWithParamsResponses[keyof GetApiV1MiscStatusWithParamsResponses];
+
+export type GetApiV1ApplicationsListData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/v1/applications/list";
+};
+
+export type GetApiV1ApplicationsListResponses = {
+  /**
+   * A successful response object
+   */
+  200: {
+    /**
+     * Whether the response indicates success
+     */
+    ok: true;
+    /**
+     * The response data
+     */
+    data: Array<{
+      id: string;
+      name: string;
+      emoji: string;
+      status: "synced" | "syncing" | "conflict" | "error";
+      lastSyncedAt: string;
+      version: string;
+    }>;
+    /**
+     * Human-readable status message of the response
+     */
+    message: "Success";
+    /**
+     * Unique ID of the request
+     */
+    requestId: string;
+  };
+};
+
+export type GetApiV1ApplicationsListResponse =
+  GetApiV1ApplicationsListResponses[keyof GetApiV1ApplicationsListResponses];

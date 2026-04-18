@@ -5,6 +5,8 @@ import type { AxiosError } from "axios";
 import { type DefaultError, queryOptions, type UseMutationOptions } from "@tanstack/react-query";
 
 import type {
+  GetApiV1ApplicationsListData,
+  GetApiV1ApplicationsListResponse,
   GetApiV1AuthMeData,
   GetApiV1AuthMeError,
   GetApiV1AuthMeResponse,
@@ -19,7 +21,7 @@ import type {
 } from "../types.gen";
 
 import { client } from "../client.gen";
-import { AuthService, MiscService, type Options } from "../sdk.gen";
+import { ApplicationsService, AuthService, MiscService, type Options } from "../sdk.gen";
 
 /**
  * Login with email and password
@@ -171,4 +173,31 @@ export const getApiV1MiscStatusWithParamsOptions = (
       return data;
     },
     queryKey: getApiV1MiscStatusWithParamsQueryKey(options),
+  });
+
+export const getApiV1ApplicationsListQueryKey = (options?: Options<GetApiV1ApplicationsListData>) =>
+  createQueryKey("getApiV1ApplicationsList", options, false, ["Applications"]);
+
+/**
+ * Get Applications List
+ *
+ * Get list of all applications with their sync status
+ */
+export const getApiV1ApplicationsListOptions = (options?: Options<GetApiV1ApplicationsListData>) =>
+  queryOptions<
+    GetApiV1ApplicationsListResponse,
+    AxiosError<DefaultError>,
+    GetApiV1ApplicationsListResponse,
+    ReturnType<typeof getApiV1ApplicationsListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await ApplicationsService.getApiV1ApplicationsList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getApiV1ApplicationsListQueryKey(options),
   });

@@ -55,7 +55,7 @@ const genSdk = async () => {
       indexFile: false,
     },
     plugins: [
-      { name: "@hey-api/typescript", enums: "typescript-const" },
+      { name: "@hey-api/typescript", enums: false },
       {
         name: "@hey-api/sdk",
         operations: {

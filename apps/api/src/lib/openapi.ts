@@ -5,7 +5,8 @@ import z from "zod";
 import { createSchema } from "zod-openapi";
 
 import { ErrorSchema, zOkRes } from "@/lib/response";
-import * as Schemas from "@/schema";
+import * as AuthSchema from "@/schema/auth";
+import * as IntegrationSchema from "@/schema/integrations";
 
 // oxlint-disable-next-line typescript/no-explicit-any
 export function setupOpenAPI(app: OpenAPIHono<any>) {
@@ -20,7 +21,7 @@ export function setupOpenAPI(app: OpenAPIHono<any>) {
     createSchema(zOkRes(z.any())).schema,
   );
 
-  for (const [name, schema] of Object.entries(Schemas)) {
+  for (const [name, schema] of [AuthSchema, IntegrationSchema].map(Object.entries).flat()) {
     app.openAPIRegistry.registerComponent("schemas", name, createSchema(schema).schema);
   }
 
