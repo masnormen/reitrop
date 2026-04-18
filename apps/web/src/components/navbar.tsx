@@ -25,8 +25,6 @@ export function Navbar() {
     await router.navigate({ to: "/" });
   };
 
-  console.log({ user, error });
-
   return (
     <nav className="bg-background border-b">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">

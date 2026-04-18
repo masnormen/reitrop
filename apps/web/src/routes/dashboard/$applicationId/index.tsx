@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const Route = createFileRoute("/dashboard/$applicationId")({
+export const Route = createFileRoute("/dashboard/$applicationId/")({
   ssr: false,
   params: {
     parse: ({ applicationId }) => {
@@ -99,9 +99,16 @@ function IntegrationDetailContent({ applicationId }: { applicationId: Applicatio
                 <p className="text-sm text-muted-foreground">ID: {integration.data.id}</p>
               </div>
             </div>
-            <Button size="lg" className="font-bold">
-              <RefreshCcw /> Sync Now
-            </Button>
+            <Link
+              to="/dashboard/$applicationId/resolve"
+              params={{
+                applicationId,
+              }}
+            >
+              <Button size="lg" className="font-bold">
+                <RefreshCcw /> Sync Now
+              </Button>
+            </Link>
           </div>
         </CardHeader>
         <CardContent>

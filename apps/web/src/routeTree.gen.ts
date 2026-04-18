@@ -11,7 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
-import { Route as DashboardApplicationIdRouteImport } from './routes/dashboard/$applicationId'
+import { Route as DashboardApplicationIdIndexRouteImport } from './routes/dashboard/$applicationId/index'
+import { Route as DashboardApplicationIdResolveRouteImport } from './routes/dashboard/$applicationId/resolve'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -23,40 +24,64 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/dashboard/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardApplicationIdRoute = DashboardApplicationIdRouteImport.update({
-  id: '/dashboard/$applicationId',
-  path: '/dashboard/$applicationId',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const DashboardApplicationIdIndexRoute =
+  DashboardApplicationIdIndexRouteImport.update({
+    id: '/dashboard/$applicationId/',
+    path: '/dashboard/$applicationId/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardApplicationIdResolveRoute =
+  DashboardApplicationIdResolveRouteImport.update({
+    id: '/dashboard/$applicationId/resolve',
+    path: '/dashboard/$applicationId/resolve',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/dashboard/$applicationId': typeof DashboardApplicationIdRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/$applicationId/resolve': typeof DashboardApplicationIdResolveRoute
+  '/dashboard/$applicationId/': typeof DashboardApplicationIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/dashboard/$applicationId': typeof DashboardApplicationIdRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/dashboard/$applicationId/resolve': typeof DashboardApplicationIdResolveRoute
+  '/dashboard/$applicationId': typeof DashboardApplicationIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/dashboard/$applicationId': typeof DashboardApplicationIdRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/$applicationId/resolve': typeof DashboardApplicationIdResolveRoute
+  '/dashboard/$applicationId/': typeof DashboardApplicationIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard/$applicationId' | '/dashboard/'
+  fullPaths:
+    | '/'
+    | '/dashboard/'
+    | '/dashboard/$applicationId/resolve'
+    | '/dashboard/$applicationId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard/$applicationId' | '/dashboard'
-  id: '__root__' | '/' | '/dashboard/$applicationId' | '/dashboard/'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/dashboard/$applicationId/resolve'
+    | '/dashboard/$applicationId'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard/'
+    | '/dashboard/$applicationId/resolve'
+    | '/dashboard/$applicationId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DashboardApplicationIdRoute: typeof DashboardApplicationIdRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardApplicationIdResolveRoute: typeof DashboardApplicationIdResolveRoute
+  DashboardApplicationIdIndexRoute: typeof DashboardApplicationIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -75,11 +100,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/$applicationId': {
-      id: '/dashboard/$applicationId'
+    '/dashboard/$applicationId/': {
+      id: '/dashboard/$applicationId/'
       path: '/dashboard/$applicationId'
-      fullPath: '/dashboard/$applicationId'
-      preLoaderRoute: typeof DashboardApplicationIdRouteImport
+      fullPath: '/dashboard/$applicationId/'
+      preLoaderRoute: typeof DashboardApplicationIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$applicationId/resolve': {
+      id: '/dashboard/$applicationId/resolve'
+      path: '/dashboard/$applicationId/resolve'
+      fullPath: '/dashboard/$applicationId/resolve'
+      preLoaderRoute: typeof DashboardApplicationIdResolveRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -87,8 +119,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DashboardApplicationIdRoute: DashboardApplicationIdRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardApplicationIdResolveRoute: DashboardApplicationIdResolveRoute,
+  DashboardApplicationIdIndexRoute: DashboardApplicationIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

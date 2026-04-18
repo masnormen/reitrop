@@ -4,13 +4,10 @@ import { jsonContentRequired } from "stoker/openapi/helpers";
 import { createV1RouteApp } from "@/app/v1.factory";
 import { okRes, zOkRes } from "@/lib/response";
 import { HttpStatusCodes } from "@/lib/status-code";
-import { INTEGRATIONS } from "@/mock";
+import { INTEGRATIONS, SYNC_EVENTS } from "@/mock";
 import { ApplicationId, Integration, SyncChange, SyncData, SyncEvent } from "@/schema/integrations";
 
 const EXTERNAL_API_URL = "https://portier-takehometest.onrender.com/api/v1/data/sync";
-
-// In-memory storage for sync events
-const SYNC_EVENTS = new Map<string, SyncEvent[]>();
 
 const SyncQuerySchema = z.object({
   application_id: ApplicationId,
@@ -186,7 +183,7 @@ const integrationRoutes = createV1RouteApp()
     async (c) => {
       const { application_id } = c.req.valid("param");
 
-      const events = SYNC_EVENTS.get(application_id) || [];
+      const events = SYNC_EVENTS[application_id] || [];
 
       return c.json(okRes(events, c.var.requestId), HttpStatusCodes.OK);
     },
@@ -243,10 +240,8 @@ const integrationRoutes = createV1RouteApp()
       };
 
       // Store the event
-      if (!SYNC_EVENTS.has(application_id)) {
-        SYNC_EVENTS.set(application_id, []);
-      }
-      SYNC_EVENTS.get(application_id)!.push(syncEvent);
+      SYNC_EVENTS[application_id] ??= [];
+      SYNC_EVENTS[application_id].push(syncEvent);
 
       return c.json(okRes(syncEvent, c.var.requestId), HttpStatusCodes.OK);
     },

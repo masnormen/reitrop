@@ -163,6 +163,9 @@ importers:
       react:
         specifier: 19.2.5
         version: 19.2.5
+      react-confirm:
+        specifier: ^0.5.0
+        version: 0.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       react-dom:
         specifier: 19.2.5
         version: 19.2.5(react@19.2.5)
@@ -4019,6 +4022,12 @@ packages:
 
   rc9@2.1.2:
     resolution: {integrity: sha512-btXCnMmRIBINM2LDZoEmOogIZU7Qe7zn4BpomSKZ/ykbLObuBdvG+mFq11DL6fjH1DRwHhrlgtYWG96bJiC7Cg==}
+
+  react-confirm@0.5.0:
+    resolution: {integrity: sha512-pCGpMrgA1/ERlLnGeUiUnURk2hq4k1mep7QDOLibUNITTkJzcKj6tvGRZk3FnQ06GiGtUffMJmBioqewNVO2Ag==}
+    peerDependencies:
+      react: '>=18.x'
+      react-dom: '>=18.x'
 
   react-dom@19.2.5:
     resolution: {integrity: sha512-J5bAZz+DXMMwW/wV3xzKke59Af6CHY7G4uYLN1OvBcKEsWOs4pQExj86BBKamxl/Ik5bx9whOrvBlSDfWzgSag==}
@@ -7926,6 +7935,11 @@ snapshots:
     dependencies:
       defu: 6.1.4
       destr: 2.0.5
+
+  react-confirm@0.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
+    dependencies:
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
 
   react-dom@19.2.5(react@19.2.5):
     dependencies:
