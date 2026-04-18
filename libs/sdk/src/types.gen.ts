@@ -26,6 +26,33 @@ export type OkResponse = {
   requestId: string;
 };
 
+export type Session = {
+  id: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    role: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  createdAt: string;
+  expiresAt: string;
+};
+
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 /**
  * An error response object
  */
@@ -160,6 +187,7 @@ export type PostApiV1AuthLoginResponses = {
         createdAt: string;
         expiresAt: string;
       };
+      token: string;
     };
     /**
      * Human-readable status message of the response
@@ -174,6 +202,95 @@ export type PostApiV1AuthLoginResponses = {
 
 export type PostApiV1AuthLoginResponse =
   PostApiV1AuthLoginResponses[keyof PostApiV1AuthLoginResponses];
+
+export type GetApiV1AuthMeData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/v1/auth/me";
+};
+
+export type GetApiV1AuthMeErrors = {
+  /**
+   * An error response object
+   */
+  401: {
+    /**
+     * Whether the response indicates success
+     */
+    ok: false;
+    /**
+     * Specific error code
+     */
+    errorCode: "UNAUTHORIZED";
+    /**
+     * Human-readable error message
+     */
+    message: string;
+    /**
+     * Unique ID of the request
+     */
+    requestId: string;
+  };
+  /**
+   * An error response object
+   */
+  500: {
+    /**
+     * Whether the response indicates success
+     */
+    ok: false;
+    /**
+     * Specific error code
+     */
+    errorCode: "INTERNAL_SERVER_ERROR";
+    /**
+     * Human-readable error message
+     */
+    message: "Something went wrong. Please try again later.";
+    /**
+     * Unique ID of the request
+     */
+    requestId: string;
+  };
+};
+
+export type GetApiV1AuthMeError = GetApiV1AuthMeErrors[keyof GetApiV1AuthMeErrors];
+
+export type GetApiV1AuthMeResponses = {
+  /**
+   * A successful response object
+   */
+  200: {
+    /**
+     * Whether the response indicates success
+     */
+    ok: true;
+    /**
+     * The response data
+     */
+    data: {
+      id: string;
+      name: string;
+      email: string;
+      phone: string;
+      role: string;
+      status: string;
+      createdAt: string;
+      updatedAt: string;
+    };
+    /**
+     * Human-readable status message of the response
+     */
+    message: "Success";
+    /**
+     * Unique ID of the request
+     */
+    requestId: string;
+  };
+};
+
+export type GetApiV1AuthMeResponse = GetApiV1AuthMeResponses[keyof GetApiV1AuthMeResponses];
 
 export type GetApiV1MiscStatusData = {
   body?: never;

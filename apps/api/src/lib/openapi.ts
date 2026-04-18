@@ -5,6 +5,7 @@ import z from "zod";
 import { createSchema } from "zod-openapi";
 
 import { ErrorSchema, zOkRes } from "@/lib/response";
+import * as Schemas from "@/schema";
 
 // oxlint-disable-next-line typescript/no-explicit-any
 export function setupOpenAPI(app: OpenAPIHono<any>) {
@@ -18,6 +19,10 @@ export function setupOpenAPI(app: OpenAPIHono<any>) {
     "OkResponse",
     createSchema(zOkRes(z.any())).schema,
   );
+
+  for (const [name, schema] of Object.entries(Schemas)) {
+    app.openAPIRegistry.registerComponent("schemas", name, createSchema(schema).schema);
+  }
 
   app.openAPIRegistry.registerComponent(
     "schemas",

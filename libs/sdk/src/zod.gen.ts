@@ -12,6 +12,41 @@ export const zOkResponse = z.object({
   requestId: z.string(),
 });
 
+export const zSession = z.object({
+  id: z.string(),
+  user: z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z
+      .email()
+      .regex(
+        /^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$/,
+      ),
+    phone: z.string(),
+    role: z.string(),
+    status: z.string(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+  }),
+  createdAt: z.string(),
+  expiresAt: z.string(),
+});
+
+export const zUser = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z
+    .email()
+    .regex(
+      /^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$/,
+    ),
+  phone: z.string(),
+  role: z.string(),
+  status: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
 /**
  * An error response object
  */
@@ -55,6 +90,26 @@ export const zPostApiV1AuthLoginResponse = z.object({
       createdAt: z.string(),
       expiresAt: z.string(),
     }),
+    token: z.string(),
+  }),
+  message: z.enum(["Success"]),
+  requestId: z.string(),
+});
+
+/**
+ * A successful response object
+ */
+export const zGetApiV1AuthMeResponse = z.object({
+  ok: z.literal(true),
+  data: z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.email(),
+    phone: z.string(),
+    role: z.string(),
+    status: z.string(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
   }),
   message: z.enum(["Success"]),
   requestId: z.string(),

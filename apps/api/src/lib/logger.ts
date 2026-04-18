@@ -1,4 +1,3 @@
-import { omitBy } from "es-toolkit";
 import { pinoLogger as logger } from "hono-pino";
 import pino from "pino";
 import pinoPretty from "pino-pretty";
@@ -35,7 +34,6 @@ export function pinoLogger() {
         req: {
           method: c.req.method,
           url: c.req.path,
-          headers: omitBy(c.req.header(), (_, key) => key.startsWith("sec-")),
         },
       }),
       onResBindings: (c) => ({

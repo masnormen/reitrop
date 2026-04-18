@@ -1,5 +1,5 @@
 import { createRoute } from "@hono/zod-openapi";
-import { setSignedCookie } from "hono/cookie";
+import { sign } from "hono/jwt";
 import { jsonContentRequired } from "stoker/openapi/helpers";
 import { z } from "zod";
 
@@ -9,16 +9,19 @@ import { ApiError } from "@/lib/error";
 import { errorContent, okRes, zOkRes } from "@/lib/response";
 import { HttpStatusCodes } from "@/lib/status-code";
 import { MOCK_USER } from "@/mock";
-import { Session } from "@/schema/user";
+import { Session, User } from "@/schema";
 
 const LoginSchema = z.object({
   email: z.email(),
   password: z.string(),
 });
 
-const SessionResponseSchema = z.object({
+const LoginResponseSchema = z.object({
   session: Session,
+  token: z.string(),
 });
+
+const AuthMeResponseSchema = User;
 
 export const authRoutes = createV1RouteApp()
   /**
@@ -45,7 +48,7 @@ export const authRoutes = createV1RouteApp()
       },
       responses: {
         [HttpStatusCodes.OK]: jsonContentRequired(
-          zOkRes(SessionResponseSchema),
+          zOkRes(LoginResponseSchema),
           "Returns user and session data",
         ),
         ...errorContent(["MALFORMED_INPUT", "UNAUTHORIZED"]),
@@ -62,28 +65,57 @@ export const authRoutes = createV1RouteApp()
       }
 
       const ONE_HOUR_MS = 3600 * 1000;
+      const EXPIRE_TIME = new Date(Date.now() + ONE_HOUR_MS);
       const MOCK_NEW_SESSION = {
         id: crypto.randomUUID(),
         user: MOCK_USER,
         createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + ONE_HOUR_MS).toISOString(), // 1 hour from now
+        expiresAt: EXPIRE_TIME.toISOString(), // 1 hour from now
       };
 
-      await setSignedCookie(c, "session", JSON.stringify(MOCK_NEW_SESSION), env.AUTH_SECRET, {
-        httpOnly: true,
-        secure: env.APP_ENV === "production",
-        sameSite: "lax",
-        maxAge: 3600, // 1 hour
-      });
+      const token = await sign(
+        { ...MOCK_NEW_SESSION, sub: MOCK_USER.id, exp: EXPIRE_TIME.getTime() },
+        env.AUTH_SECRET,
+        "HS256",
+      );
 
       return c.json(
         okRes(
           {
             session: MOCK_NEW_SESSION,
+            token,
           },
           c.var.requestId,
         ),
         HttpStatusCodes.OK,
       );
+    },
+  )
+  /**
+   * =============================
+   * GET /auth/me
+   * =============================
+   */
+  .openapi(
+    createRoute({
+      tags: ["Auth"],
+      summary: "Get current user session",
+      description: "Returns the current user's session information",
+      method: "get",
+      path: "/me",
+      responses: {
+        [HttpStatusCodes.OK]: jsonContentRequired(
+          zOkRes(AuthMeResponseSchema),
+          "Returns user data",
+        ),
+        ...errorContent(["UNAUTHORIZED"]),
+      },
+    }),
+    async (c) => {
+      if (!c.var.session) {
+        throw ApiError.UNAUTHORIZED({ message: "Not authenticated" });
+      }
+
+      return c.json(okRes(c.var.session.user, c.var.requestId), HttpStatusCodes.OK);
     },
   );

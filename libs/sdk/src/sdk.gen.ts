@@ -4,6 +4,9 @@ import * as z from "zod";
 
 import type { Client, Options as Options2, TDataShape } from "./client";
 import type {
+  GetApiV1AuthMeData,
+  GetApiV1AuthMeErrors,
+  GetApiV1AuthMeResponses,
   GetApiV1MiscStatusData,
   GetApiV1MiscStatusResponses,
   GetApiV1MiscStatusWithParamsData,
@@ -64,6 +67,33 @@ export class AuthService {
         "Content-Type": "application/json",
         ...options.headers,
       },
+    });
+  }
+
+  /**
+   * Get current user session
+   *
+   * Returns the current user's session information
+   */
+  public static getApiV1AuthMe<ThrowOnError extends boolean = false>(
+    options?: Options<GetApiV1AuthMeData, ThrowOnError>,
+  ) {
+    return (options?.client ?? client).get<
+      GetApiV1AuthMeResponses,
+      GetApiV1AuthMeErrors,
+      ThrowOnError
+    >({
+      requestValidator: async (data) =>
+        await z
+          .object({
+            body: z.never().optional(),
+            path: z.never().optional(),
+            query: z.never().optional(),
+          })
+          .parseAsync(data),
+      responseType: "json",
+      url: "/api/v1/auth/me",
+      ...options,
     });
   }
 }

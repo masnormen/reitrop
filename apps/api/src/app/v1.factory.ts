@@ -1,9 +1,9 @@
 import type { Context } from "hono";
 
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { getSignedCookie } from "hono/cookie";
 import { cors } from "hono/cors";
 import { createMiddleware } from "hono/factory";
+import { verify } from "hono/jwt";
 import { requestId } from "hono/request-id";
 import { trimTrailingSlash } from "hono/trailing-slash";
 import { z } from "zod";
@@ -13,7 +13,7 @@ import type { ExtractEnv } from "@/types/index";
 import { env } from "@/env";
 import { ApiError } from "@/lib/error";
 import { pinoLogger } from "@/lib/logger";
-import { Session } from "@/schema/user";
+import { Session } from "@/schema";
 
 const v1DefaultHook = <TContext extends Context>(
   result:
@@ -61,15 +61,30 @@ export const createV1App = () => {
           session: Session | null;
         };
       }>(async (c, next) => {
-        const rawSessionString = await getSignedCookie(c, env.AUTH_SECRET, "session");
-        const session = Session.safeParse(JSON.parse(rawSessionString || "null"));
-
-        if (!session.success) {
+        const authHeader = c.req.header("Authorization");
+        if (!authHeader) {
           c.set("session", null);
           return next();
         }
-        c.set("session", session.data);
-        return next();
+
+        if (!authHeader.startsWith("Bearer ")) {
+          throw ApiError.MALFORMED_INPUT({ message: "Invalid Authorization header format" });
+        }
+
+        const token = authHeader.substring(7); // Remove "Bearer " prefix
+        try {
+          const decoded = await verify(token, env.AUTH_SECRET, "HS256");
+          const session = Session.safeParse(decoded);
+
+          if (!session.success) {
+            c.set("session", null);
+            return next();
+          }
+          c.set("session", session.data);
+          return next();
+        } catch {
+          throw ApiError.UNAUTHORIZED({ message: "Invalid or expired token" });
+        }
       }),
     );
 

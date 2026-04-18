@@ -5,6 +5,9 @@ import type { AxiosError } from "axios";
 import { type DefaultError, queryOptions, type UseMutationOptions } from "@tanstack/react-query";
 
 import type {
+  GetApiV1AuthMeData,
+  GetApiV1AuthMeError,
+  GetApiV1AuthMeResponse,
   GetApiV1MiscStatusData,
   GetApiV1MiscStatusResponse,
   GetApiV1MiscStatusWithParamsData,
@@ -85,6 +88,33 @@ const createQueryKey = <TOptions extends Options>(
   }
   return [params];
 };
+
+export const getApiV1AuthMeQueryKey = (options?: Options<GetApiV1AuthMeData>) =>
+  createQueryKey("getApiV1AuthMe", options, false, ["Auth"]);
+
+/**
+ * Get current user session
+ *
+ * Returns the current user's session information
+ */
+export const getApiV1AuthMeOptions = (options?: Options<GetApiV1AuthMeData>) =>
+  queryOptions<
+    GetApiV1AuthMeResponse,
+    AxiosError<GetApiV1AuthMeError>,
+    GetApiV1AuthMeResponse,
+    ReturnType<typeof getApiV1AuthMeQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await AuthService.getApiV1AuthMe({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getApiV1AuthMeQueryKey(options),
+  });
 
 export const getApiV1MiscStatusQueryKey = (options?: Options<GetApiV1MiscStatusData>) =>
   createQueryKey("getApiV1MiscStatus", options, false, ["Misc"]);
