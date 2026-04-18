@@ -173,3 +173,30 @@ export const zGetApiV1ApplicationsListResponse = z.object({
   message: z.enum(["Success"]),
   requestId: z.string(),
 });
+
+export const zGetApiV1DataSyncQuery = z.object({
+  application_id: z.enum(["salesforce", "hubspot", "stripe", "slack", "zendesk", "intercom"]),
+});
+
+/**
+ * Returns sync approval data from external API
+ */
+export const zGetApiV1DataSyncResponse = z.object({
+  code: z.string(),
+  message: z.string(),
+  data: z.object({
+    sync_approval: z.object({
+      application_name: z.string(),
+      changes: z.array(
+        z.object({
+          id: z.string(),
+          field_name: z.string(),
+          change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
+          current_value: z.string().optional(),
+          new_value: z.string().optional(),
+        }),
+      ),
+    }),
+    metadata: z.record(z.string(), z.unknown()),
+  }),
+});

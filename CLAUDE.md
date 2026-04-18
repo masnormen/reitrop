@@ -13,6 +13,10 @@ This is a modern full-stack monorepo built with:
 - **Build System**: Turborepo + PNPM workspaces
 - **Code Quality**: Oxlint + Oxfmt (with Tailwind CSS support)
 
+## Important Documentation
+
+**ASSUMPTIONS.md** - Documents assumptions made about external APIs and data structures. Review this file when working with integrations or sync endpoints to understand the expected behavior and data patterns.
+
 ## Common Commands
 
 ### Development

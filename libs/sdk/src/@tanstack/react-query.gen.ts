@@ -10,6 +10,9 @@ import type {
   GetApiV1AuthMeData,
   GetApiV1AuthMeError,
   GetApiV1AuthMeResponse,
+  GetApiV1DataSyncData,
+  GetApiV1DataSyncError,
+  GetApiV1DataSyncResponse,
   GetApiV1MiscStatusData,
   GetApiV1MiscStatusResponse,
   GetApiV1MiscStatusWithParamsData,
@@ -21,7 +24,13 @@ import type {
 } from "../types.gen";
 
 import { client } from "../client.gen";
-import { ApplicationsService, AuthService, MiscService, type Options } from "../sdk.gen";
+import {
+  ApplicationsService,
+  AuthService,
+  DataService,
+  MiscService,
+  type Options,
+} from "../sdk.gen";
 
 /**
  * Login with email and password
@@ -200,4 +209,31 @@ export const getApiV1ApplicationsListOptions = (options?: Options<GetApiV1Applic
       return data;
     },
     queryKey: getApiV1ApplicationsListQueryKey(options),
+  });
+
+export const getApiV1DataSyncQueryKey = (options: Options<GetApiV1DataSyncData>) =>
+  createQueryKey("getApiV1DataSync", options, false, ["Data"]);
+
+/**
+ * [EXTERNAL] Get Data Sync
+ *
+ * Proxy to external API to get sync approval data for an application
+ */
+export const getApiV1DataSyncOptions = (options: Options<GetApiV1DataSyncData>) =>
+  queryOptions<
+    GetApiV1DataSyncResponse,
+    AxiosError<GetApiV1DataSyncError>,
+    GetApiV1DataSyncResponse,
+    ReturnType<typeof getApiV1DataSyncQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await DataService.getApiV1DataSync({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getApiV1DataSyncQueryKey(options),
   });

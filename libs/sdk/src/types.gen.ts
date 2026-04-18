@@ -464,3 +464,52 @@ export type GetApiV1ApplicationsListResponses = {
 
 export type GetApiV1ApplicationsListResponse =
   GetApiV1ApplicationsListResponses[keyof GetApiV1ApplicationsListResponses];
+
+export type GetApiV1DataSyncData = {
+  body?: never;
+  path?: never;
+  query: {
+    application_id: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
+  };
+  url: "/api/v1/data/sync";
+};
+
+export type GetApiV1DataSyncErrors = {
+  /**
+   * External API error response
+   */
+  500: {
+    code: string;
+    message: string;
+    error: string;
+  };
+};
+
+export type GetApiV1DataSyncError = GetApiV1DataSyncErrors[keyof GetApiV1DataSyncErrors];
+
+export type GetApiV1DataSyncResponses = {
+  /**
+   * Returns sync approval data from external API
+   */
+  200: {
+    code: string;
+    message: string;
+    data: {
+      sync_approval: {
+        application_name: string;
+        changes: Array<{
+          id: string;
+          field_name: string;
+          change_type: "ADD" | "UPDATE" | "DELETE";
+          current_value?: string;
+          new_value?: string;
+        }>;
+      };
+      metadata: {
+        [key: string]: unknown;
+      };
+    };
+  };
+};
+
+export type GetApiV1DataSyncResponse = GetApiV1DataSyncResponses[keyof GetApiV1DataSyncResponses];

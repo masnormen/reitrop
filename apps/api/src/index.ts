@@ -8,12 +8,14 @@ import { pinoInstance } from "@/lib/logger";
 import { setupOpenAPI } from "@/lib/openapi";
 import applicationsRoutes from "@/modules/applications/index";
 import { authRoutes } from "@/modules/auth/index";
+import dataRoutes from "@/modules/data/index";
 import { miscRoutes } from "@/modules/misc/index";
 
 const v1App = createV1App()
   .route("/auth", authRoutes)
   .route("/misc", miscRoutes)
-  .route("/applications", applicationsRoutes);
+  .route("/applications", applicationsRoutes)
+  .route("/data", dataRoutes);
 
 export const app = new OpenAPIHono().basePath("/api").route("/v1", v1App);
 

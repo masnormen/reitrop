@@ -20,3 +20,34 @@ Query Parameters:
 - application_id: 'salesforce' | 'hubspot' | 'stripe' | 'slack' | 'zendesk' | 'intercom'
   The application for which the data sync is being requested.
 ```
+
+---
+
+## Sync Approval Data Change Types
+
+The response from `/api/v1/data/sync` contains a `changes` array with three change types that operate at different levels:
+
+### Change Type Patterns
+
+- **UPDATE** `entity.field` - Modifies an existing field's value on an entity
+  - Example: `{"field_name": "user.email", "current_value": "old@example.com", "new_value": "new@example.com"}`
+  - Both `current_value` and `new_value` are present
+
+- **DELETE** `entity.id` - Removes an entire entity
+  - Example: `{"field_name": "user.id", "current_value": "9e0f1a2b...", "change_type": "DELETE"}`
+  - Only `current_value` is present (the ID being deleted)
+  - No `new_value`
+
+- **ADD** `entity.id` - Adds a new entity
+  - Example: `{"field_name": "user.id", "change_type": "ADD", "new_value": "3e4f5a6b..."}`
+  - Only `new_value` is present (the ID being added)
+  - No `current_value`
+
+### Key Insight
+
+When `field_name` ends with `.id`, it indicates **whole entity operations**:
+
+- `user.id` → Adding/removing a user entity
+- `key.id` → Adding/removing a key entity
+
+When `field_name` is `entity.something_else`, it's a **field modification** on an existing entity.

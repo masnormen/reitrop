@@ -9,6 +9,9 @@ import type {
   GetApiV1AuthMeData,
   GetApiV1AuthMeErrors,
   GetApiV1AuthMeResponses,
+  GetApiV1DataSyncData,
+  GetApiV1DataSyncErrors,
+  GetApiV1DataSyncResponses,
   GetApiV1MiscStatusData,
   GetApiV1MiscStatusResponses,
   GetApiV1MiscStatusWithParamsData,
@@ -22,6 +25,7 @@ import type {
 import { client } from "./client.gen";
 import {
   zGetApiV1ApplicationsListQuery,
+  zGetApiV1DataSyncQuery,
   zGetApiV1MiscStatusWithParamsQuery,
   zPostApiV1AuthLoginBody,
 } from "./zod.gen";
@@ -180,6 +184,35 @@ export class ApplicationsService {
           .parseAsync(data),
       responseType: "json",
       url: "/api/v1/applications/list",
+      ...options,
+    });
+  }
+}
+
+export class DataService {
+  /**
+   * [EXTERNAL] Get Data Sync
+   *
+   * Proxy to external API to get sync approval data for an application
+   */
+  public static getApiV1DataSync<ThrowOnError extends boolean = false>(
+    options: Options<GetApiV1DataSyncData, ThrowOnError>,
+  ) {
+    return (options.client ?? client).get<
+      GetApiV1DataSyncResponses,
+      GetApiV1DataSyncErrors,
+      ThrowOnError
+    >({
+      requestValidator: async (data) =>
+        await z
+          .object({
+            body: z.never().optional(),
+            path: z.never().optional(),
+            query: zGetApiV1DataSyncQuery,
+          })
+          .parseAsync(data),
+      responseType: "json",
+      url: "/api/v1/data/sync",
       ...options,
     });
   }
