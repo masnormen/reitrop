@@ -1,7 +1,7 @@
 "use client";
 
 import { getApiV1AuthMeOptions } from "@repo/sdk/query";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Link, useRouter } from "@tanstack/react-router";
 import { useSetAtom } from "jotai/react";
 import { RESET } from "jotai/utils";
@@ -13,17 +13,19 @@ import { Button } from "@/components/ui/button";
 export function Navbar() {
   const router = useRouter();
 
-  const { data: user } = useQuery(getApiV1AuthMeOptions());
+  const { data: user, error } = useQuery({ ...getApiV1AuthMeOptions(), retry: false });
   const setSessionJwt = useSetAtom(sessionJwtAtom);
-
-  const queryClient = useQueryClient();
 
   const handleLogout = async () => {
     setSessionJwt(RESET);
-    await queryClient.invalidateQueries({ queryKey: getApiV1AuthMeOptions().queryKey });
+    await router.options.context.queryClient.invalidateQueries({
+      queryKey: getApiV1AuthMeOptions().queryKey,
+    });
     await router.invalidate();
     await router.navigate({ to: "/" });
   };
+
+  console.log({ user, error });
 
   return (
     <nav className="bg-background border-b">
@@ -42,7 +44,7 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          {user ? (
+          {user && !error ? (
             <>
               <div className="flex items-center gap-2">
                 <Avatar>

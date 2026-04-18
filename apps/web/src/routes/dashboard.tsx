@@ -8,7 +8,7 @@ export const Route = createFileRoute("/dashboard")({
   ssr: false,
   loader: async ({ context }) => {
     try {
-      await context.queryClient.fetchQuery(getApiV1AuthMeOptions());
+      await context.queryClient.fetchQuery({ ...getApiV1AuthMeOptions(), retry: false });
     } catch {
       return redirect({ to: "/" });
     }
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function DashboardPage() {
-  const { data: user } = useQuery(getApiV1AuthMeOptions());
+  const { data: user } = useQuery({ ...getApiV1AuthMeOptions(), retry: false });
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

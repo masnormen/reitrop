@@ -8,7 +8,14 @@ import { flushSync } from "react-dom";
 
 import { sessionJwtAtom } from "@/atoms/index";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
@@ -16,7 +23,7 @@ export const Route = createFileRoute("/")({
   ssr: false,
   loader: async ({ context }) => {
     try {
-      await context.queryClient.fetchQuery(getApiV1AuthMeOptions());
+      await context.queryClient.fetchQuery({ ...getApiV1AuthMeOptions(), retry: false });
       console.log("User is already authenticated, redirecting to dashboard...");
       return redirect({ to: "/dashboard" });
     } catch {
@@ -48,48 +55,53 @@ function LoginPage() {
 
   return (
     <div className="bg-background flex min-h-screen items-center justify-center px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Welcome back</CardTitle>
-          <CardDescription>Sign in to your account to continue</CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="admin@admin.com"
-                required
-                defaultValue="admin@admin.com"
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="••••••••"
-                required
-                defaultValue="password"
-              />
-            </Field>
-            {loginMutation.error && (
-              <p className="text-sm text-destructive">
-                {loginMutation.error.message || "Invalid email or password"}
-              </p>
-            )}
-          </FieldGroup>
+      <form onSubmit={handleSubmit} className="w-full max-w-md">
+        <Card>
+          <CardHeader>
+            <CardTitle>Welcome!</CardTitle>
+            <CardDescription>
+              <p>Sign in to your account to continue</p>
+              <p className="text-xs">*see README.md for credentials</p>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="admin@admin.com"
+                  required
+                  defaultValue="admin@admin.com"
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="••••••••"
+                  required
+                  defaultValue="password"
+                />
+              </Field>
+              {loginMutation.error && (
+                <p className="text-sm text-destructive">
+                  {loginMutation.error.message || "Invalid email or password"}
+                </p>
+              )}
+            </FieldGroup>
+          </CardContent>
           <CardFooter>
             <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
               {loginMutation.isPending ? "Signing in..." : "Sign in"}
             </Button>
           </CardFooter>
-        </form>
-      </Card>
+        </Card>
+      </form>
     </div>
   );
 }
