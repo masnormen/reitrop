@@ -7,7 +7,7 @@ import { zApplicationId } from "@repo/sdk/zod";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import dayjs from "dayjs";
-import { ArrowLeft, RefreshCcw } from "lucide-react";
+import { ArrowLeft, RefreshCcw, History } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -93,16 +93,23 @@ function IntegrationDetailContent({ applicationId }: { applicationId: Applicatio
                 <p className="text-sm text-muted-foreground">ID: {integration.data.id}</p>
               </div>
             </div>
-            <Link
-              to="/dashboard/$applicationId/resolve"
-              params={{
-                applicationId,
-              }}
-            >
-              <Button size="lg" className="font-bold">
-                <RefreshCcw /> Sync Now
-              </Button>
-            </Link>
+            <div className="flex gap-2">
+              <Link to="/dashboard/$applicationId/history" params={{ applicationId }}>
+                <Button size="lg" variant="outline">
+                  <History /> History
+                </Button>
+              </Link>
+              <Link
+                to="/dashboard/$applicationId/resolve"
+                params={{
+                  applicationId,
+                }}
+              >
+                <Button size="lg" className="font-bold">
+                  <RefreshCcw /> Sync Now
+                </Button>
+              </Link>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -121,38 +128,6 @@ function IntegrationDetailContent({ applicationId }: { applicationId: Applicatio
               <p className="text-sm font-medium text-muted-foreground">Last Synced</p>
               <p className="mt-1 text-sm">
                 {dayjs(integration.data.lastSyncedAt).format("MMMM DD, YYYY HH:mm")}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Statistics</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Total History Records</p>
-              <p className="mt-1 text-2xl font-bold">{"integration.data.stats.totalRecords"}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Synced Records</p>
-              <p className="mt-1 text-2xl font-bold text-green-600">
-                {"integration.data.stats.syncedRecords"}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Failed Records</p>
-              <p className="mt-1 text-2xl font-bold text-red-600">
-                {"integration.data.stats.failedRecords"}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Pending Changes</p>
-              <p className="mt-1 text-2xl font-bold text-orange-600">
-                {"integration.data.stats.pendingChanges"}
               </p>
             </div>
           </div>
@@ -180,32 +155,6 @@ function IntegrationDetailSkeleton() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
-            <Skeleton className="h-16" />
-            <Skeleton className="h-16" />
-            <Skeleton className="h-16" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-6 w-48" />
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Skeleton className="h-16" />
-            <Skeleton className="h-16" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-6 w-48" />
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
-            <Skeleton className="h-16" />
             <Skeleton className="h-16" />
             <Skeleton className="h-16" />
             <Skeleton className="h-16" />

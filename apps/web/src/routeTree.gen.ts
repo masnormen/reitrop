@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardApplicationIdIndexRouteImport } from './routes/dashboard/$applicationId/index'
 import { Route as DashboardApplicationIdResolveRouteImport } from './routes/dashboard/$applicationId/resolve'
+import { Route as DashboardApplicationIdHistoryRouteImport } from './routes/dashboard/$applicationId/history'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -36,16 +37,24 @@ const DashboardApplicationIdResolveRoute =
     path: '/dashboard/$applicationId/resolve',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DashboardApplicationIdHistoryRoute =
+  DashboardApplicationIdHistoryRouteImport.update({
+    id: '/dashboard/$applicationId/history',
+    path: '/dashboard/$applicationId/history',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/$applicationId/history': typeof DashboardApplicationIdHistoryRoute
   '/dashboard/$applicationId/resolve': typeof DashboardApplicationIdResolveRoute
   '/dashboard/$applicationId/': typeof DashboardApplicationIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/dashboard/$applicationId/history': typeof DashboardApplicationIdHistoryRoute
   '/dashboard/$applicationId/resolve': typeof DashboardApplicationIdResolveRoute
   '/dashboard/$applicationId': typeof DashboardApplicationIdIndexRoute
 }
@@ -53,6 +62,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/$applicationId/history': typeof DashboardApplicationIdHistoryRoute
   '/dashboard/$applicationId/resolve': typeof DashboardApplicationIdResolveRoute
   '/dashboard/$applicationId/': typeof DashboardApplicationIdIndexRoute
 }
@@ -61,18 +71,21 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard/'
+    | '/dashboard/$applicationId/history'
     | '/dashboard/$applicationId/resolve'
     | '/dashboard/$applicationId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
+    | '/dashboard/$applicationId/history'
     | '/dashboard/$applicationId/resolve'
     | '/dashboard/$applicationId'
   id:
     | '__root__'
     | '/'
     | '/dashboard/'
+    | '/dashboard/$applicationId/history'
     | '/dashboard/$applicationId/resolve'
     | '/dashboard/$applicationId/'
   fileRoutesById: FileRoutesById
@@ -80,6 +93,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardApplicationIdHistoryRoute: typeof DashboardApplicationIdHistoryRoute
   DashboardApplicationIdResolveRoute: typeof DashboardApplicationIdResolveRoute
   DashboardApplicationIdIndexRoute: typeof DashboardApplicationIdIndexRoute
 }
@@ -114,12 +128,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardApplicationIdResolveRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/$applicationId/history': {
+      id: '/dashboard/$applicationId/history'
+      path: '/dashboard/$applicationId/history'
+      fullPath: '/dashboard/$applicationId/history'
+      preLoaderRoute: typeof DashboardApplicationIdHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardApplicationIdHistoryRoute: DashboardApplicationIdHistoryRoute,
   DashboardApplicationIdResolveRoute: DashboardApplicationIdResolveRoute,
   DashboardApplicationIdIndexRoute: DashboardApplicationIdIndexRoute,
 }
