@@ -36,3 +36,28 @@ export const SyncData = z.object({
   metadata: z.record(z.string(), z.unknown()),
 });
 export type SyncData = z.infer<typeof SyncData>;
+
+export const ConnectionStatus = z.enum(["connected", "disconnected", "pending", "error"]);
+export type ConnectionStatus = z.infer<typeof ConnectionStatus>;
+
+export const SyncEventStatus = z.enum(["pending", "approved", "rejected", "failed"]);
+export type SyncEventStatus = z.infer<typeof SyncEventStatus>;
+
+export const SyncEvent = SyncChange.extend({
+  syncId: z.string(),
+  applicationId: z.string(),
+  timestamp: z.string(),
+  status: SyncEventStatus,
+  version: z.string(),
+  resolvedBy: z.string(),
+});
+export type SyncEvent = z.infer<typeof SyncEvent>;
+
+export const ResolveRequest = z.object({
+  syncChange: SyncChange,
+  action: z.enum(["approve", "reject"]),
+});
+export type ResolveRequest = z.infer<typeof ResolveRequest>;
+
+export const ResolveResponse = SyncEvent;
+export type ResolveResponse = z.infer<typeof ResolveResponse>;

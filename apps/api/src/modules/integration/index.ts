@@ -5,9 +5,18 @@ import { createV1RouteApp } from "@/app/v1.factory";
 import { okRes, zOkRes } from "@/lib/response";
 import { HttpStatusCodes } from "@/lib/status-code";
 import { INTEGRATIONS } from "@/mock";
-import { Integration, SyncData } from "@/schema/integrations";
+import {
+  Integration,
+  ResolveRequest,
+  ResolveResponse,
+  SyncData,
+  SyncEvent,
+} from "@/schema/integrations";
 
 const EXTERNAL_API_URL = "https://portier-takehometest.onrender.com/api/v1/data/sync";
+
+// In-memory storage for sync events
+const SYNC_EVENTS = new Map<string, SyncEvent[]>();
 
 const SyncQuerySchema = z.object({
   application_id: z.enum(["salesforce", "hubspot", "stripe", "slack", "zendesk", "intercom"]),
@@ -71,7 +80,7 @@ const integrationRoutes = createV1RouteApp()
    */
   .openapi(
     createRoute({
-      tags: ["Data"],
+      tags: ["Integrations"],
       summary: "[EXTERNAL] Get Data Sync",
       description: "Proxy to external API to get sync approval data for an application",
       method: "get",
@@ -110,6 +119,137 @@ const integrationRoutes = createV1RouteApp()
       }
 
       return c.json(parsedData.data, HttpStatusCodes.OK);
+    },
+  )
+  /**
+   * Get Integration Details
+   */
+  .openapi(
+    createRoute({
+      tags: ["Integrations"],
+      summary: "Get Integration Details",
+      description: "Get detailed information about a specific integration",
+      method: "get",
+      path: "/{application_id}",
+      request: {
+        params: z.object({
+          application_id: z.string(),
+        }),
+      },
+      responses: {
+        [HttpStatusCodes.OK]: jsonContentRequired(
+          zOkRes(Integration),
+          "Returns integration details",
+        ),
+        [HttpStatusCodes.NOT_FOUND]: jsonContentRequired(
+          z.object({ code: z.string(), message: z.string() }),
+          "Integration not found",
+        ),
+      },
+    }),
+    async (c) => {
+      const { application_id } = c.req.valid("param");
+
+      const integration = INTEGRATIONS.find((i) => i.id === application_id);
+
+      if (!integration) {
+        return c.json(
+          { code: "NOT_FOUND", message: "Integration not found" },
+          HttpStatusCodes.NOT_FOUND,
+        );
+      }
+
+      return c.json(okRes(integration, c.var.requestId), HttpStatusCodes.OK);
+    },
+  )
+  /**
+   * Get Sync History
+   */
+  .openapi(
+    createRoute({
+      tags: ["Integrations"],
+      summary: "Get Sync History",
+      description: "Get historical sync events for an integration",
+      method: "get",
+      path: "/{application_id}/history",
+      request: {
+        params: z.object({
+          application_id: z.string(),
+        }),
+      },
+      responses: {
+        [HttpStatusCodes.OK]: jsonContentRequired(
+          zOkRes(z.array(SyncEvent)),
+          "Returns sync history",
+        ),
+      },
+    }),
+    async (c) => {
+      const { application_id } = c.req.valid("param");
+
+      const events = SYNC_EVENTS.get(application_id) || [];
+
+      return c.json(okRes(events, c.var.requestId), HttpStatusCodes.OK);
+    },
+  )
+  /**
+   * Resolve Sync Changes
+   */
+  .openapi(
+    createRoute({
+      tags: ["Integrations"],
+      summary: "Resolve Sync Changes",
+      description: "Approve or reject sync changes",
+      method: "post",
+      path: "/{application_id}/resolve",
+      request: {
+        params: z.object({
+          application_id: z.string(),
+        }),
+        body: {
+          content: {
+            "application/json": {
+              schema: ResolveRequest,
+            },
+          },
+        },
+      },
+      responses: {
+        [HttpStatusCodes.OK]: jsonContentRequired(
+          zOkRes(ResolveResponse),
+          "Returns resolution result",
+        ),
+      },
+    }),
+    async (c) => {
+      const { application_id } = c.req.valid("param");
+      const { syncChange, action } = c.req.valid("json");
+
+      // Fetch current sync data to get the changes
+      const externalUrl = new URL(EXTERNAL_API_URL);
+      externalUrl.searchParams.set("application_id", application_id);
+
+      // Create sync event record
+      const syncId = `sync_${Date.now()}_${application_id}`;
+      const integration = INTEGRATIONS.find((i) => i.id === application_id);
+
+      const syncEvent: SyncEvent = {
+        syncId,
+        applicationId: application_id,
+        timestamp: new Date().toISOString(),
+        status: action === "approve" ? "approved" : "rejected",
+        version: integration?.version || "unknown",
+        resolvedBy: c.var.session?.user.id || "",
+        ...syncChange,
+      };
+
+      // Store the event
+      if (!SYNC_EVENTS.has(application_id)) {
+        SYNC_EVENTS.set(application_id, []);
+      }
+      SYNC_EVENTS.get(application_id)!.push(syncEvent);
+
+      return c.json(okRes(syncEvent, c.var.requestId), HttpStatusCodes.OK);
     },
   );
 

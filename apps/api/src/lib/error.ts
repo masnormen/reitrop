@@ -138,6 +138,10 @@ export const API_ERROR_DICTIONARY = {
     status: HttpStatusCodes.UNAUTHORIZED,
     message: message ?? "Missing user session. Please log in!",
   }),
+  SESSION_EXPIRED: ({ message }: { message?: string } = {}) => ({
+    status: HttpStatusCodes.UNAUTHORIZED,
+    message: message ?? "User session has expired. Please log in again.",
+  }),
   FORBIDDEN: {
     status: HttpStatusCodes.FORBIDDEN,
     message: "You do not have enough permission to perform this action.",

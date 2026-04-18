@@ -8,6 +8,11 @@ import type {
   GetApiV1AuthMeData,
   GetApiV1AuthMeError,
   GetApiV1AuthMeResponse,
+  GetApiV1DataByApplicationIdData,
+  GetApiV1DataByApplicationIdError,
+  GetApiV1DataByApplicationIdHistoryData,
+  GetApiV1DataByApplicationIdHistoryResponse,
+  GetApiV1DataByApplicationIdResponse,
   GetApiV1DataListData,
   GetApiV1DataListResponse,
   GetApiV1DataSyncData,
@@ -21,16 +26,12 @@ import type {
   PostApiV1AuthLoginData,
   PostApiV1AuthLoginError,
   PostApiV1AuthLoginResponse,
+  PostApiV1DataByApplicationIdResolveData,
+  PostApiV1DataByApplicationIdResolveResponse,
 } from "../types.gen";
 
 import { client } from "../client.gen";
-import {
-  AuthService,
-  DataService,
-  IntegrationsService,
-  MiscService,
-  type Options,
-} from "../sdk.gen";
+import { AuthService, IntegrationsService, MiscService, type Options } from "../sdk.gen";
 
 /**
  * Login with email and password
@@ -212,7 +213,7 @@ export const getApiV1DataListOptions = (options?: Options<GetApiV1DataListData>)
   });
 
 export const getApiV1DataSyncQueryKey = (options: Options<GetApiV1DataSyncData>) =>
-  createQueryKey("getApiV1DataSync", options, false, ["Data"]);
+  createQueryKey("getApiV1DataSync", options, false, ["Integrations"]);
 
 /**
  * [EXTERNAL] Get Data Sync
@@ -227,7 +228,7 @@ export const getApiV1DataSyncOptions = (options: Options<GetApiV1DataSyncData>) 
     ReturnType<typeof getApiV1DataSyncQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await DataService.getApiV1DataSync({
+      const { data } = await IntegrationsService.getApiV1DataSync({
         ...options,
         ...queryKey[0],
         signal,
@@ -237,3 +238,92 @@ export const getApiV1DataSyncOptions = (options: Options<GetApiV1DataSyncData>) 
     },
     queryKey: getApiV1DataSyncQueryKey(options),
   });
+
+export const getApiV1DataByApplicationIdQueryKey = (
+  options: Options<GetApiV1DataByApplicationIdData>,
+) => createQueryKey("getApiV1DataByApplicationId", options, false, ["Integrations"]);
+
+/**
+ * Get Integration Details
+ *
+ * Get detailed information about a specific integration
+ */
+export const getApiV1DataByApplicationIdOptions = (
+  options: Options<GetApiV1DataByApplicationIdData>,
+) =>
+  queryOptions<
+    GetApiV1DataByApplicationIdResponse,
+    AxiosError<GetApiV1DataByApplicationIdError>,
+    GetApiV1DataByApplicationIdResponse,
+    ReturnType<typeof getApiV1DataByApplicationIdQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await IntegrationsService.getApiV1DataByApplicationId({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getApiV1DataByApplicationIdQueryKey(options),
+  });
+
+export const getApiV1DataByApplicationIdHistoryQueryKey = (
+  options: Options<GetApiV1DataByApplicationIdHistoryData>,
+) => createQueryKey("getApiV1DataByApplicationIdHistory", options, false, ["Integrations"]);
+
+/**
+ * Get Sync History
+ *
+ * Get historical sync events for an integration
+ */
+export const getApiV1DataByApplicationIdHistoryOptions = (
+  options: Options<GetApiV1DataByApplicationIdHistoryData>,
+) =>
+  queryOptions<
+    GetApiV1DataByApplicationIdHistoryResponse,
+    AxiosError<DefaultError>,
+    GetApiV1DataByApplicationIdHistoryResponse,
+    ReturnType<typeof getApiV1DataByApplicationIdHistoryQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await IntegrationsService.getApiV1DataByApplicationIdHistory({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getApiV1DataByApplicationIdHistoryQueryKey(options),
+  });
+
+/**
+ * Resolve Sync Changes
+ *
+ * Approve or reject sync changes
+ */
+export const postApiV1DataByApplicationIdResolveMutation = (
+  options?: Partial<Options<PostApiV1DataByApplicationIdResolveData>>,
+): UseMutationOptions<
+  PostApiV1DataByApplicationIdResolveResponse,
+  AxiosError<DefaultError>,
+  Options<PostApiV1DataByApplicationIdResolveData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PostApiV1DataByApplicationIdResolveResponse,
+    AxiosError<DefaultError>,
+    Options<PostApiV1DataByApplicationIdResolveData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await IntegrationsService.postApiV1DataByApplicationIdResolve({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};

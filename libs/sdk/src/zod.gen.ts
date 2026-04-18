@@ -49,6 +49,8 @@ export const zUser = z.object({
 
 export const zChangeType = z.enum(["ADD", "UPDATE", "DELETE"]);
 
+export const zConnectionStatus = z.enum(["connected", "disconnected", "pending", "error"]);
+
 export const zIntegration = z.object({
   id: z.string(),
   name: z.string(),
@@ -56,6 +58,31 @@ export const zIntegration = z.object({
   status: z.enum(["synced", "syncing", "conflict", "error"]),
   lastSyncedAt: z.string(),
   version: z.string(),
+});
+
+export const zResolveRequest = z.object({
+  syncChange: z.object({
+    id: z.string(),
+    field_name: z.string(),
+    change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
+    current_value: z.string().optional(),
+    new_value: z.string().optional(),
+  }),
+  action: z.enum(["approve", "reject"]),
+});
+
+export const zResolveResponse = z.object({
+  id: z.string(),
+  field_name: z.string(),
+  change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
+  current_value: z.string().optional(),
+  new_value: z.string().optional(),
+  syncId: z.string(),
+  applicationId: z.string(),
+  timestamp: z.string(),
+  status: z.enum(["pending", "approved", "rejected", "failed"]),
+  version: z.string(),
+  resolvedBy: z.string(),
 });
 
 export const zSyncApproval = z.object({
@@ -95,6 +122,22 @@ export const zSyncData = z.object({
   metadata: z.record(z.string(), z.unknown()),
 });
 
+export const zSyncEvent = z.object({
+  id: z.string(),
+  field_name: z.string(),
+  change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
+  current_value: z.string().optional(),
+  new_value: z.string().optional(),
+  syncId: z.string(),
+  applicationId: z.string(),
+  timestamp: z.string(),
+  status: z.enum(["pending", "approved", "rejected", "failed"]),
+  version: z.string(),
+  resolvedBy: z.string(),
+});
+
+export const zSyncEventStatus = z.enum(["pending", "approved", "rejected", "failed"]);
+
 export const zSyncStatus = z.enum(["synced", "syncing", "conflict", "error"]);
 
 /**
@@ -106,6 +149,7 @@ export const zErrorResponse = z.object({
     "MALFORMED_INPUT",
     "NOT_FOUND",
     "UNAUTHORIZED",
+    "SESSION_EXPIRED",
     "FORBIDDEN",
     "INTERNAL_SERVER_ERROR",
     "UNSPECIFIED_ERROR",
@@ -238,4 +282,90 @@ export const zGetApiV1DataSyncResponse = z.object({
     }),
     metadata: z.record(z.string(), z.unknown()),
   }),
+});
+
+export const zGetApiV1DataByApplicationIdPath = z.object({
+  application_id: z.string(),
+});
+
+/**
+ * A successful response object
+ */
+export const zGetApiV1DataByApplicationIdResponse = z.object({
+  ok: z.literal(true),
+  data: z.object({
+    id: z.string(),
+    name: z.string(),
+    emoji: z.string(),
+    status: z.enum(["synced", "syncing", "conflict", "error"]),
+    lastSyncedAt: z.string(),
+    version: z.string(),
+  }),
+  message: z.enum(["Success"]),
+  requestId: z.string(),
+});
+
+export const zGetApiV1DataByApplicationIdHistoryPath = z.object({
+  application_id: z.string(),
+});
+
+/**
+ * A successful response object
+ */
+export const zGetApiV1DataByApplicationIdHistoryResponse = z.object({
+  ok: z.literal(true),
+  data: z.array(
+    z.object({
+      id: z.string(),
+      field_name: z.string(),
+      change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
+      current_value: z.string().optional(),
+      new_value: z.string().optional(),
+      syncId: z.string(),
+      applicationId: z.string(),
+      timestamp: z.string(),
+      status: z.enum(["pending", "approved", "rejected", "failed"]),
+      version: z.string(),
+      resolvedBy: z.string(),
+    }),
+  ),
+  message: z.enum(["Success"]),
+  requestId: z.string(),
+});
+
+export const zPostApiV1DataByApplicationIdResolveBody = z.object({
+  syncChange: z.object({
+    id: z.string(),
+    field_name: z.string(),
+    change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
+    current_value: z.string().optional(),
+    new_value: z.string().optional(),
+  }),
+  action: z.enum(["approve", "reject"]),
+});
+
+export const zPostApiV1DataByApplicationIdResolvePath = z.object({
+  application_id: z.string(),
+});
+
+/**
+ * A successful response object
+ */
+export const zPostApiV1DataByApplicationIdResolveResponse = z.object({
+  ok: z.literal(true),
+  data: z.object({
+    id: z.string(),
+    field_name: z.string(),
+    change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
+    current_value: z.string().optional(),
+    new_value: z.string().optional(),
+    syncId: z.string(),
+    applicationId: z.string(),
+    timestamp: z.string(),
+    status: z.enum(["pending", "approved", "rejected", "failed"]),
+    version: z.string(),
+    resolvedBy: z.string(),
+  }),
+  message: z.enum(["Success"]),
+  requestId: z.string(),
 });

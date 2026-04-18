@@ -7,6 +7,11 @@ import type {
   GetApiV1AuthMeData,
   GetApiV1AuthMeErrors,
   GetApiV1AuthMeResponses,
+  GetApiV1DataByApplicationIdData,
+  GetApiV1DataByApplicationIdErrors,
+  GetApiV1DataByApplicationIdHistoryData,
+  GetApiV1DataByApplicationIdHistoryResponses,
+  GetApiV1DataByApplicationIdResponses,
   GetApiV1DataListData,
   GetApiV1DataListResponses,
   GetApiV1DataSyncData,
@@ -20,14 +25,20 @@ import type {
   PostApiV1AuthLoginData,
   PostApiV1AuthLoginErrors,
   PostApiV1AuthLoginResponses,
+  PostApiV1DataByApplicationIdResolveData,
+  PostApiV1DataByApplicationIdResolveResponses,
 } from "./types.gen";
 
 import { client } from "./client.gen";
 import {
+  zGetApiV1DataByApplicationIdHistoryPath,
+  zGetApiV1DataByApplicationIdPath,
   zGetApiV1DataListQuery,
   zGetApiV1DataSyncQuery,
   zGetApiV1MiscStatusWithParamsQuery,
   zPostApiV1AuthLoginBody,
+  zPostApiV1DataByApplicationIdResolveBody,
+  zPostApiV1DataByApplicationIdResolvePath,
 } from "./zod.gen";
 
 export type Options<
@@ -183,9 +194,7 @@ export class IntegrationsService {
       ...options,
     });
   }
-}
 
-export class DataService {
   /**
    * [EXTERNAL] Get Data Sync
    *
@@ -210,6 +219,91 @@ export class DataService {
       responseType: "json",
       url: "/api/v1/data/sync",
       ...options,
+    });
+  }
+
+  /**
+   * Get Integration Details
+   *
+   * Get detailed information about a specific integration
+   */
+  public static getApiV1DataByApplicationId<ThrowOnError extends boolean = false>(
+    options: Options<GetApiV1DataByApplicationIdData, ThrowOnError>,
+  ) {
+    return (options.client ?? client).get<
+      GetApiV1DataByApplicationIdResponses,
+      GetApiV1DataByApplicationIdErrors,
+      ThrowOnError
+    >({
+      requestValidator: async (data) =>
+        await z
+          .object({
+            body: z.never().optional(),
+            path: zGetApiV1DataByApplicationIdPath,
+            query: z.never().optional(),
+          })
+          .parseAsync(data),
+      responseType: "json",
+      url: "/api/v1/data/{application_id}",
+      ...options,
+    });
+  }
+
+  /**
+   * Get Sync History
+   *
+   * Get historical sync events for an integration
+   */
+  public static getApiV1DataByApplicationIdHistory<ThrowOnError extends boolean = false>(
+    options: Options<GetApiV1DataByApplicationIdHistoryData, ThrowOnError>,
+  ) {
+    return (options.client ?? client).get<
+      GetApiV1DataByApplicationIdHistoryResponses,
+      unknown,
+      ThrowOnError
+    >({
+      requestValidator: async (data) =>
+        await z
+          .object({
+            body: z.never().optional(),
+            path: zGetApiV1DataByApplicationIdHistoryPath,
+            query: z.never().optional(),
+          })
+          .parseAsync(data),
+      responseType: "json",
+      url: "/api/v1/data/{application_id}/history",
+      ...options,
+    });
+  }
+
+  /**
+   * Resolve Sync Changes
+   *
+   * Approve or reject sync changes
+   */
+  public static postApiV1DataByApplicationIdResolve<ThrowOnError extends boolean = false>(
+    options: Options<PostApiV1DataByApplicationIdResolveData, ThrowOnError>,
+  ) {
+    return (options.client ?? client).post<
+      PostApiV1DataByApplicationIdResolveResponses,
+      unknown,
+      ThrowOnError
+    >({
+      requestValidator: async (data) =>
+        await z
+          .object({
+            body: zPostApiV1DataByApplicationIdResolveBody.optional(),
+            path: zPostApiV1DataByApplicationIdResolvePath,
+            query: z.never().optional(),
+          })
+          .parseAsync(data),
+      responseType: "json",
+      url: "/api/v1/data/{application_id}/resolve",
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
     });
   }
 }

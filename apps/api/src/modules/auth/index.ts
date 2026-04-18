@@ -74,7 +74,7 @@ export const authRoutes = createV1RouteApp()
       };
 
       const token = await sign(
-        { ...MOCK_NEW_SESSION, sub: MOCK_USER.id, exp: EXPIRE_TIME.getTime() },
+        { ...MOCK_NEW_SESSION, sub: MOCK_USER.id, exp: Math.floor(EXPIRE_TIME.getTime() / 1000) },
         env.AUTH_SECRET,
         "HS256",
       );

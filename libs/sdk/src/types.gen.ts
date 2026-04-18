@@ -55,6 +55,8 @@ export type User = {
 
 export type ChangeType = "ADD" | "UPDATE" | "DELETE";
 
+export type ConnectionStatus = "connected" | "disconnected" | "pending" | "error";
+
 export type Integration = {
   id: string;
   name: string;
@@ -62,6 +64,31 @@ export type Integration = {
   status: "synced" | "syncing" | "conflict" | "error";
   lastSyncedAt: string;
   version: string;
+};
+
+export type ResolveRequest = {
+  syncChange: {
+    id: string;
+    field_name: string;
+    change_type: "ADD" | "UPDATE" | "DELETE";
+    current_value?: string;
+    new_value?: string;
+  };
+  action: "approve" | "reject";
+};
+
+export type ResolveResponse = {
+  id: string;
+  field_name: string;
+  change_type: "ADD" | "UPDATE" | "DELETE";
+  current_value?: string;
+  new_value?: string;
+  syncId: string;
+  applicationId: string;
+  timestamp: string;
+  status: "pending" | "approved" | "rejected" | "failed";
+  version: string;
+  resolvedBy: string;
 };
 
 export type SyncApproval = {
@@ -99,6 +126,22 @@ export type SyncData = {
   };
 };
 
+export type SyncEvent = {
+  id: string;
+  field_name: string;
+  change_type: "ADD" | "UPDATE" | "DELETE";
+  current_value?: string;
+  new_value?: string;
+  syncId: string;
+  applicationId: string;
+  timestamp: string;
+  status: "pending" | "approved" | "rejected" | "failed";
+  version: string;
+  resolvedBy: string;
+};
+
+export type SyncEventStatus = "pending" | "approved" | "rejected" | "failed";
+
 export type SyncStatus = "synced" | "syncing" | "conflict" | "error";
 
 /**
@@ -116,6 +159,7 @@ export type ErrorResponse = {
     | "MALFORMED_INPUT"
     | "NOT_FOUND"
     | "UNAUTHORIZED"
+    | "SESSION_EXPIRED"
     | "FORBIDDEN"
     | "INTERNAL_SERVER_ERROR"
     | "UNSPECIFIED_ERROR";
@@ -549,3 +593,164 @@ export type GetApiV1DataSyncResponses = {
 };
 
 export type GetApiV1DataSyncResponse = GetApiV1DataSyncResponses[keyof GetApiV1DataSyncResponses];
+
+export type GetApiV1DataByApplicationIdData = {
+  body?: never;
+  path: {
+    application_id: string;
+  };
+  query?: never;
+  url: "/api/v1/data/{application_id}";
+};
+
+export type GetApiV1DataByApplicationIdErrors = {
+  /**
+   * Integration not found
+   */
+  404: {
+    code: string;
+    message: string;
+  };
+};
+
+export type GetApiV1DataByApplicationIdError =
+  GetApiV1DataByApplicationIdErrors[keyof GetApiV1DataByApplicationIdErrors];
+
+export type GetApiV1DataByApplicationIdResponses = {
+  /**
+   * A successful response object
+   */
+  200: {
+    /**
+     * Whether the response indicates success
+     */
+    ok: true;
+    /**
+     * The response data
+     */
+    data: {
+      id: string;
+      name: string;
+      emoji: string;
+      status: "synced" | "syncing" | "conflict" | "error";
+      lastSyncedAt: string;
+      version: string;
+    };
+    /**
+     * Human-readable status message of the response
+     */
+    message: "Success";
+    /**
+     * Unique ID of the request
+     */
+    requestId: string;
+  };
+};
+
+export type GetApiV1DataByApplicationIdResponse =
+  GetApiV1DataByApplicationIdResponses[keyof GetApiV1DataByApplicationIdResponses];
+
+export type GetApiV1DataByApplicationIdHistoryData = {
+  body?: never;
+  path: {
+    application_id: string;
+  };
+  query?: never;
+  url: "/api/v1/data/{application_id}/history";
+};
+
+export type GetApiV1DataByApplicationIdHistoryResponses = {
+  /**
+   * A successful response object
+   */
+  200: {
+    /**
+     * Whether the response indicates success
+     */
+    ok: true;
+    /**
+     * The response data
+     */
+    data: Array<{
+      id: string;
+      field_name: string;
+      change_type: "ADD" | "UPDATE" | "DELETE";
+      current_value?: string;
+      new_value?: string;
+      syncId: string;
+      applicationId: string;
+      timestamp: string;
+      status: "pending" | "approved" | "rejected" | "failed";
+      version: string;
+      resolvedBy: string;
+    }>;
+    /**
+     * Human-readable status message of the response
+     */
+    message: "Success";
+    /**
+     * Unique ID of the request
+     */
+    requestId: string;
+  };
+};
+
+export type GetApiV1DataByApplicationIdHistoryResponse =
+  GetApiV1DataByApplicationIdHistoryResponses[keyof GetApiV1DataByApplicationIdHistoryResponses];
+
+export type PostApiV1DataByApplicationIdResolveData = {
+  body?: {
+    syncChange: {
+      id: string;
+      field_name: string;
+      change_type: "ADD" | "UPDATE" | "DELETE";
+      current_value?: string;
+      new_value?: string;
+    };
+    action: "approve" | "reject";
+  };
+  path: {
+    application_id: string;
+  };
+  query?: never;
+  url: "/api/v1/data/{application_id}/resolve";
+};
+
+export type PostApiV1DataByApplicationIdResolveResponses = {
+  /**
+   * A successful response object
+   */
+  200: {
+    /**
+     * Whether the response indicates success
+     */
+    ok: true;
+    /**
+     * The response data
+     */
+    data: {
+      id: string;
+      field_name: string;
+      change_type: "ADD" | "UPDATE" | "DELETE";
+      current_value?: string;
+      new_value?: string;
+      syncId: string;
+      applicationId: string;
+      timestamp: string;
+      status: "pending" | "approved" | "rejected" | "failed";
+      version: string;
+      resolvedBy: string;
+    };
+    /**
+     * Human-readable status message of the response
+     */
+    message: "Success";
+    /**
+     * Unique ID of the request
+     */
+    requestId: string;
+  };
+};
+
+export type PostApiV1DataByApplicationIdResolveResponse =
+  PostApiV1DataByApplicationIdResolveResponses[keyof PostApiV1DataByApplicationIdResolveResponses];

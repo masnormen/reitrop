@@ -6,6 +6,7 @@ import { createMiddleware } from "hono/factory";
 import { verify } from "hono/jwt";
 import { requestId } from "hono/request-id";
 import { trimTrailingSlash } from "hono/trailing-slash";
+import { JwtTokenExpired } from "hono/utils/jwt/types";
 import { z } from "zod";
 
 import type { ExtractEnv } from "@/types/index";
@@ -82,7 +83,10 @@ export const createV1App = () => {
           }
           c.set("session", session.data);
           return next();
-        } catch {
+        } catch (err) {
+          if (err instanceof JwtTokenExpired) {
+            throw ApiError.SESSION_EXPIRED({ message: "Token has expired" });
+          }
           throw ApiError.UNAUTHORIZED({ message: "Invalid or expired token" });
         }
       }),
