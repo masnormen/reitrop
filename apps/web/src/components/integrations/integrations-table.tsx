@@ -1,14 +1,80 @@
 import type { Integration } from "@repo/sdk/types";
+import type { ColumnDef } from "@tanstack/react-table";
 
 import { useState, useMemo } from "react";
 
-import { StatusBadge } from "./status-badge";
+import { DataTable } from "@/components/ui/data-table";
 
 interface IntegrationsTableProps {
   integrations: Integration[];
+  isLoading?: boolean;
 }
 
-export function IntegrationsTable({ integrations }: IntegrationsTableProps) {
+const formatLastSynced = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return `${diffDays}d ago`;
+};
+
+const columns: ColumnDef<Integration>[] = [
+  {
+    accessorKey: "name",
+    header: "Service",
+    size: 40,
+    cell: ({ row }) => (
+      <div className="flex items-center gap-3">
+        <img
+          src={`https://fav.farm/${encodeURIComponent(row.original.emoji)}`}
+          alt=""
+          className="h-8 w-8 rounded"
+        />
+        <div>
+          <div className="font-medium">{row.original.name}</div>
+          <div className="text-xs text-muted-foreground">{row.original.id}</div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "lastSyncedAt",
+    header: "Last Synced",
+    size: 25,
+    cell: ({ row }) => (
+      <span className="text-sm text-muted-foreground">
+        {formatLastSynced(row.original.lastSyncedAt)}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "version",
+    header: "Version",
+    size: 25,
+    cell: ({ row }) => (
+      <span className="text-sm text-muted-foreground">{row.original.version}</span>
+    ),
+  },
+  {
+    id: "actions",
+    header: () => <div className="text-right">Actions</div>,
+    cell: () => (
+      <div className="text-right">
+        <button type="button" className="text-sm font-medium text-primary hover:underline">
+          View Details
+        </button>
+      </div>
+    ),
+  },
+];
+
+export function IntegrationsTable({ integrations, isLoading }: IntegrationsTableProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredIntegrations = useMemo(() => {
@@ -20,20 +86,6 @@ export function IntegrationsTable({ integrations }: IntegrationsTableProps) {
         integration.id.toLowerCase().includes(query),
     );
   }, [integrations, searchQuery]);
-
-  const formatLastSynced = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return `${diffDays}d ago`;
-  };
 
   return (
     <div className="space-y-4">
@@ -63,75 +115,7 @@ export function IntegrationsTable({ integrations }: IntegrationsTableProps) {
         </div>
       </div>
 
-      <div className="rounded-lg border bg-card">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="border-b bg-muted/50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground uppercase">
-                  Integration
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground uppercase">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground uppercase">
-                  Last Synced
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground uppercase">
-                  Version
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium tracking-wider text-muted-foreground uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {filteredIntegrations.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-sm text-muted-foreground">
-                    No integrations found matching "{searchQuery}"
-                  </td>
-                </tr>
-              ) : (
-                filteredIntegrations.map((integration) => (
-                  <tr key={integration.id} className="transition-colors hover:bg-muted/50">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={`https://fav.farm/${encodeURIComponent(integration.emoji)}`}
-                          alt=""
-                          className="h-8 w-8 rounded"
-                        />
-                        <div>
-                          <div className="font-medium">{integration.name}</div>
-                          <div className="text-xs text-muted-foreground">{integration.id}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <StatusBadge status={integration.status} />
-                    </td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground">
-                      {formatLastSynced(integration.lastSyncedAt)}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground">
-                      {integration.version}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <button
-                        type="button"
-                        className="text-sm font-medium text-primary hover:underline"
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <DataTable columns={columns} data={filteredIntegrations} isLoading={isLoading} />
 
       <div className="text-sm text-muted-foreground">
         Showing {filteredIntegrations.length} of {integrations.length} integration
