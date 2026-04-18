@@ -20,7 +20,11 @@ import type {
 } from "./types.gen";
 
 import { client } from "./client.gen";
-import { zGetApiV1MiscStatusWithParamsQuery, zPostApiV1AuthLoginBody } from "./zod.gen";
+import {
+  zGetApiV1ApplicationsListQuery,
+  zGetApiV1MiscStatusWithParamsQuery,
+  zPostApiV1AuthLoginBody,
+} from "./zod.gen";
 
 export type Options<
   TData extends TDataShape = TDataShape,
@@ -171,7 +175,7 @@ export class ApplicationsService {
           .object({
             body: z.never().optional(),
             path: z.never().optional(),
-            query: z.never().optional(),
+            query: zGetApiV1ApplicationsListQuery.optional(),
           })
           .parseAsync(data),
       responseType: "json",

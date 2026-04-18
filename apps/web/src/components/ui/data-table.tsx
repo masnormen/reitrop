@@ -1,6 +1,12 @@
 "use client";
 
-import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import {
+  type ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  type HeaderGroup,
+  useReactTable,
+} from "@tanstack/react-table";
 import { useMemo } from "react";
 
 import {
@@ -16,12 +22,22 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   isLoading?: boolean;
+  headerRowOptions?: {
+    onClick?: (headerGroup: HeaderGroup<TData>, e: React.MouseEvent<HTMLTableRowElement>) => void;
+    className?: string;
+  };
+  bodyRowOptions?: {
+    onClick?: (row: TData, e: React.MouseEvent<HTMLTableRowElement>) => void;
+    className?: string;
+  };
 }
 
 export function DataTable<TData, TValue>({
   columns: _columns,
   data: _data,
   isLoading,
+  headerRowOptions,
+  bodyRowOptions,
 }: DataTableProps<TData, TValue>) {
   const columns = useMemo(() => _columns, [_columns]);
   const data = useMemo(() => _data, [_data]);
@@ -51,7 +67,15 @@ export function DataTable<TData, TValue>({
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
+            <TableRow
+              key={headerGroup.id}
+              onClick={(e) => {
+                if (headerRowOptions?.onClick) {
+                  headerRowOptions.onClick(headerGroup, e);
+                }
+              }}
+              className={headerRowOptions?.className}
+            >
               {headerGroup.headers.map((header) => {
                 const columnSize = header.column.columnDef.size;
                 const style = columnSize
@@ -72,7 +96,16 @@ export function DataTable<TData, TValue>({
         <TableBody>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+                onClick={(e) => {
+                  if (bodyRowOptions?.onClick) {
+                    bodyRowOptions.onClick(row.original, e);
+                  }
+                }}
+                className={bodyRowOptions?.className}
+              >
                 {row.getVisibleCells().map((cell) => {
                   const columnSize = cell.column.columnDef.size;
                   const style = columnSize

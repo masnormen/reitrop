@@ -20,6 +20,11 @@ const applicationsRoutes = createV1RouteApp()
       description: "Get list of all applications with their sync status",
       method: "get",
       path: "/list",
+      request: {
+        query: z.object({
+          search: z.string().optional(),
+        }),
+      },
       responses: {
         [HttpStatusCodes.OK]: jsonContentRequired(
           zOkRes(ApplicationListResponseSchema),
@@ -28,7 +33,19 @@ const applicationsRoutes = createV1RouteApp()
       },
     }),
     async (c) => {
-      return c.json(okRes(INTEGRATIONS, c.var.requestId), HttpStatusCodes.OK);
+      const { search } = c.req.valid("query");
+
+      let filteredIntegrations = INTEGRATIONS;
+      if (search) {
+        const query = search.toLowerCase();
+        filteredIntegrations = INTEGRATIONS.filter(
+          (integration) =>
+            integration.name.toLowerCase().includes(query) ||
+            integration.id.toLowerCase().includes(query),
+        );
+      }
+
+      return c.json(okRes(filteredIntegrations, c.var.requestId), HttpStatusCodes.OK);
     },
   );
 

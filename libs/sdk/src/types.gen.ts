@@ -425,7 +425,9 @@ export type GetApiV1MiscStatusWithParamsResponse =
 export type GetApiV1ApplicationsListData = {
   body?: never;
   path?: never;
-  query?: never;
+  query?: {
+    search?: string;
+  };
   url: "/api/v1/applications/list";
 };
 

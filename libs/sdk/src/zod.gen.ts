@@ -151,6 +151,10 @@ export const zGetApiV1MiscStatusWithParamsResponse = z.object({
   requestId: z.string(),
 });
 
+export const zGetApiV1ApplicationsListQuery = z.object({
+  search: z.string().optional(),
+});
+
 /**
  * A successful response object
  */

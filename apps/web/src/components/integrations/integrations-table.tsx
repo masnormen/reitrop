@@ -1,13 +1,15 @@
 import type { Integration } from "@repo/sdk/types";
 import type { ColumnDef } from "@tanstack/react-table";
 
-import { useState, useMemo } from "react";
+import { getApiV1ApplicationsListOptions } from "@repo/sdk/query";
+import { useQuery } from "@tanstack/react-query";
+import { useDebounce } from "ahooks";
+import { useState } from "react";
 
 import { DataTable } from "@/components/ui/data-table";
 
 interface IntegrationsTableProps {
-  integrations: Integration[];
-  isLoading?: boolean;
+  initialSearch?: string;
 }
 
 const formatLastSynced = (dateString: string) => {
@@ -38,7 +40,7 @@ const columns: ColumnDef<Integration>[] = [
         />
         <div>
           <div className="font-medium">{row.original.name}</div>
-          <div className="text-xs text-muted-foreground">{row.original.id}</div>
+          <div className="text-xs text-muted-foreground">ID: {row.original.id}</div>
         </div>
       </div>
     ),
@@ -74,18 +76,19 @@ const columns: ColumnDef<Integration>[] = [
   },
 ];
 
-export function IntegrationsTable({ integrations, isLoading }: IntegrationsTableProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+export function IntegrationsTable({ initialSearch }: IntegrationsTableProps) {
+  const [searchQuery, setSearchQuery] = useState(initialSearch ?? "");
+  const debouncedSearchQuery = useDebounce(searchQuery, { wait: 500 });
 
-  const filteredIntegrations = useMemo(() => {
-    if (!searchQuery) return integrations;
-    const query = searchQuery.toLowerCase();
-    return integrations.filter(
-      (integration) =>
-        integration.name.toLowerCase().includes(query) ||
-        integration.id.toLowerCase().includes(query),
-    );
-  }, [integrations, searchQuery]);
+  const { data: response, isLoading } = useQuery({
+    ...getApiV1ApplicationsListOptions({
+      query: {
+        search: debouncedSearchQuery || undefined,
+      },
+    }),
+  });
+
+  const integrations = response?.data ?? [];
 
   return (
     <div className="space-y-4">
@@ -115,12 +118,14 @@ export function IntegrationsTable({ integrations, isLoading }: IntegrationsTable
         </div>
       </div>
 
-      <DataTable columns={columns} data={filteredIntegrations} isLoading={isLoading} />
-
-      <div className="text-sm text-muted-foreground">
-        Showing {filteredIntegrations.length} of {integrations.length} integration
-        {integrations.length !== 1 ? "s" : ""}
-      </div>
+      <DataTable
+        columns={columns}
+        data={integrations}
+        isLoading={isLoading}
+        bodyRowOptions={{
+          className: "cursor-pointer",
+        }}
+      />
     </div>
   );
 }
