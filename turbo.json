@@ -10,7 +10,6 @@
       "persistent": true
     },
     "api#dev": {
-      "with": ["//#dev:compose:up"],
       "cache": false,
       "persistent": true
     },
@@ -53,7 +52,6 @@
       "env": ["DATABASE_URL"]
     },
     "db:studio": {},
-    "//#dev:compose:up": {},
     "//#lint": {},
     "//#lint:fix": {},
     "//#format": {},

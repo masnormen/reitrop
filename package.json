@@ -5,7 +5,6 @@
     "setup-project": "tsx scripts/setup-project.ts",
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "dev:compose:up": "docker compose -f ./docker-compose.dev.yml up",
     "start": "turbo run start",
     "lint": "oxlint --quiet --type-aware --type-check",
     "lint:fix": "oxlint --quiet --fix --type-aware --type-check",

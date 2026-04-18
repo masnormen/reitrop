@@ -12,6 +12,7 @@ import { ArrowLeft, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StatusChip } from "@/components/ui/status-chip";
 
 export const Route = createFileRoute("/dashboard/$applicationId/")({
   ssr: false,
@@ -80,13 +81,6 @@ function IntegrationDetailContent({ applicationId }: { applicationId: Applicatio
     );
   }
 
-  const statusColors = {
-    synced: "text-green-600 bg-green-50",
-    syncing: "text-blue-600 bg-blue-50",
-    conflict: "text-orange-600 bg-orange-50",
-    error: "text-red-600 bg-red-50",
-  };
-
   return (
     <div className="space-y-6">
       <Card>
@@ -116,11 +110,7 @@ function IntegrationDetailContent({ applicationId }: { applicationId: Applicatio
             <div>
               <p className="text-sm font-medium text-muted-foreground">Status</p>
               <p className="mt-1">
-                <span
-                  className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${statusColors[integration.data.status]}`}
-                >
-                  {integration.data.status}
-                </span>
+                <StatusChip status={integration.data.status} />
               </p>
             </div>
             <div>

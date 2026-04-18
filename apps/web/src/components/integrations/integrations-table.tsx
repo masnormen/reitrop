@@ -10,6 +10,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
+import { StatusChip } from "@/components/ui/status-chip";
 
 interface IntegrationsTableProps {
   initialSearch?: string;
@@ -33,6 +34,12 @@ const columns: ColumnDef<Integration>[] = [
         </div>
       </div>
     ),
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    size: 20,
+    cell: ({ row }) => <StatusChip status={row.original.status} />,
   },
   {
     accessorKey: "lastSyncedAt",
