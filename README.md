@@ -21,9 +21,13 @@ pnpm setup-project
 ### Run development server
 
 ```bash
-pnpm install
 pnpm dev
 ```
+
+#### App access
+
+- API: http://localhost:4200
+- Web: http://localhost:3000
 
 #### Credentials:
 
@@ -32,11 +36,18 @@ pnpm dev
 
 ### Run the project with Docker Compose
 
-If you prefer containerized development, you can run both applications together using Docker Compose. You still have to do the steps above. You can run the following command to start both applications:
+If you prefer containerized development, you can run both applications together using Docker Compose.
+
+You still have to do the steps above (fill in the `.env` file). Then, you can run the following command to start both applications:
 
 ```bash
 pnpm compose:up
 ```
+
+#### App access
+
+- API: http://localhost:4200
+- Web: http://localhost:3000
 
 #### Credentials:
 
