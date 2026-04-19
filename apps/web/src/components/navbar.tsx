@@ -1,7 +1,7 @@
 import { getApiV1AuthMeOptions } from "@repo/sdk/query";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRouter } from "@tanstack/react-router";
-import { useSetAtom } from "jotai/react";
+import { useAtom } from "jotai/react";
 import { RESET } from "jotai/utils";
 
 import { sessionJwtAtom } from "@/atoms/index";
@@ -13,7 +13,7 @@ export function Navbar() {
   const router = useRouter();
 
   const { data: user, status } = useQuery({ ...getApiV1AuthMeOptions(), retry: false });
-  const setSessionJwt = useSetAtom(sessionJwtAtom);
+  const [sessionJwt, setSessionJwt] = useAtom(sessionJwtAtom);
 
   const handleLogout = async () => {
     setSessionJwt(RESET);
@@ -31,7 +31,7 @@ export function Navbar() {
           <Link to="/" className="text-lg font-semibold">
             Reitrop
           </Link>
-          {user && (
+          {Boolean(user && sessionJwt) && (
             <div className="flex gap-4 text-sm">
               <Link to="/dashboard" className="text-muted-foreground hover:text-foreground">
                 Dashboard
@@ -41,7 +41,7 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          {status === "success" ? (
+          {status === "success" && sessionJwt ? (
             <>
               <div className="flex items-center gap-2">
                 <Avatar>

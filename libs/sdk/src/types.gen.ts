@@ -68,6 +68,17 @@ export type Integration = {
   version: string;
 };
 
+export type SyncAction = {
+  syncChange: {
+    id: string;
+    field_name: string;
+    change_type: "ADD" | "UPDATE" | "DELETE";
+    current_value?: string;
+    new_value?: string;
+  };
+  action: "accept" | "discard";
+};
+
 export type SyncApproval = {
   application_name: string;
   changes: Array<{
@@ -104,17 +115,20 @@ export type SyncData = {
 };
 
 export type SyncEvent = {
-  id: string;
-  field_name: string;
-  change_type: "ADD" | "UPDATE" | "DELETE";
-  current_value?: string;
-  new_value?: string;
-  syncId: string;
-  applicationId: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
-  timestamp: string;
-  status: "pending" | "accepted" | "discarded" | "failed";
   version: string;
-  resolvedBy: string;
+  applicationId: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
+  createdAt: string;
+  createdBy: string;
+  actions: Array<{
+    syncChange: {
+      id: string;
+      field_name: string;
+      change_type: "ADD" | "UPDATE" | "DELETE";
+      current_value?: string;
+      new_value?: string;
+    };
+    action: "accept" | "discard";
+  }>;
 };
 
 export type SyncEventStatus = "pending" | "accepted" | "discarded" | "failed";
@@ -545,7 +559,7 @@ export type GetApiV1DataByApplicationIdResponse =
 export type GetApiV1DataByApplicationIdHistoryData = {
   body?: never;
   path: {
-    application_id: string;
+    application_id: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
   };
   query?: never;
   url: "/api/v1/data/{application_id}/history";
@@ -564,17 +578,13 @@ export type GetApiV1DataByApplicationIdHistoryResponses = {
      * The response data
      */
     data: Array<{
-      id: string;
-      field_name: string;
-      change_type: "ADD" | "UPDATE" | "DELETE";
-      current_value?: string;
-      new_value?: string;
-      syncId: string;
-      applicationId: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
-      timestamp: string;
-      status: "pending" | "accepted" | "discarded" | "failed";
       version: string;
-      resolvedBy: string;
+      applicationId: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
+      createdAt: string;
+      createdBy: string;
+      added: number;
+      updated: number;
+      deleted: number;
     }>;
     /**
      * Human-readable status message of the response
@@ -590,16 +600,118 @@ export type GetApiV1DataByApplicationIdHistoryResponses = {
 export type GetApiV1DataByApplicationIdHistoryResponse =
   GetApiV1DataByApplicationIdHistoryResponses[keyof GetApiV1DataByApplicationIdHistoryResponses];
 
+export type GetApiV1DataByApplicationIdHistoryByVersionData = {
+  body?: never;
+  path: {
+    application_id: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
+    version: string;
+  };
+  query?: never;
+  url: "/api/v1/data/{application_id}/history/{version}";
+};
+
+export type GetApiV1DataByApplicationIdHistoryByVersionErrors = {
+  /**
+   * An error response object
+   */
+  404: {
+    /**
+     * Whether the response indicates success
+     */
+    ok: false;
+    /**
+     * Specific error code
+     */
+    errorCode: "NOT_FOUND";
+    /**
+     * Human-readable error message
+     */
+    message: "Requested resource was not found.";
+    /**
+     * Unique ID of the request
+     */
+    requestId: string;
+  };
+  /**
+   * An error response object
+   */
+  500: {
+    /**
+     * Whether the response indicates success
+     */
+    ok: false;
+    /**
+     * Specific error code
+     */
+    errorCode: "INTERNAL_SERVER_ERROR";
+    /**
+     * Human-readable error message
+     */
+    message: "Something went wrong. Please try again later.";
+    /**
+     * Unique ID of the request
+     */
+    requestId: string;
+  };
+};
+
+export type GetApiV1DataByApplicationIdHistoryByVersionError =
+  GetApiV1DataByApplicationIdHistoryByVersionErrors[keyof GetApiV1DataByApplicationIdHistoryByVersionErrors];
+
+export type GetApiV1DataByApplicationIdHistoryByVersionResponses = {
+  /**
+   * A successful response object
+   */
+  200: {
+    /**
+     * Whether the response indicates success
+     */
+    ok: true;
+    /**
+     * The response data
+     */
+    data: {
+      version: string;
+      applicationId: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
+      createdAt: string;
+      createdBy: string;
+      actions: Array<{
+        syncChange: {
+          id: string;
+          field_name: string;
+          change_type: "ADD" | "UPDATE" | "DELETE";
+          current_value?: string;
+          new_value?: string;
+        };
+        action: "accept" | "discard";
+      }>;
+    };
+    /**
+     * Human-readable status message of the response
+     */
+    message: "Success";
+    /**
+     * Unique ID of the request
+     */
+    requestId: string;
+  };
+};
+
+export type GetApiV1DataByApplicationIdHistoryByVersionResponse =
+  GetApiV1DataByApplicationIdHistoryByVersionResponses[keyof GetApiV1DataByApplicationIdHistoryByVersionResponses];
+
 export type PostApiV1DataByApplicationIdResolveData = {
   body?: {
-    syncChange: {
-      id: string;
-      field_name: string;
-      change_type: "ADD" | "UPDATE" | "DELETE";
-      current_value?: string;
-      new_value?: string;
-    };
-    action: "accept" | "discard";
+    syncActions: Array<{
+      syncChange: {
+        id: string;
+        field_name: string;
+        change_type: "ADD" | "UPDATE" | "DELETE";
+        current_value?: string;
+        new_value?: string;
+      };
+      action: "accept" | "discard";
+    }>;
   };
   path: {
     application_id: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
@@ -621,17 +733,20 @@ export type PostApiV1DataByApplicationIdResolveResponses = {
      * The response data
      */
     data: {
-      id: string;
-      field_name: string;
-      change_type: "ADD" | "UPDATE" | "DELETE";
-      current_value?: string;
-      new_value?: string;
-      syncId: string;
-      applicationId: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
-      timestamp: string;
-      status: "pending" | "accepted" | "discarded" | "failed";
       version: string;
-      resolvedBy: string;
+      applicationId: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
+      createdAt: string;
+      createdBy: string;
+      actions: Array<{
+        syncChange: {
+          id: string;
+          field_name: string;
+          change_type: "ADD" | "UPDATE" | "DELETE";
+          current_value?: string;
+          new_value?: string;
+        };
+        action: "accept" | "discard";
+      }>;
     };
     /**
      * Human-readable status message of the response

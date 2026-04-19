@@ -9,6 +9,9 @@ import type {
   GetApiV1AuthMeResponses,
   GetApiV1DataByApplicationIdData,
   GetApiV1DataByApplicationIdErrors,
+  GetApiV1DataByApplicationIdHistoryByVersionData,
+  GetApiV1DataByApplicationIdHistoryByVersionErrors,
+  GetApiV1DataByApplicationIdHistoryByVersionResponses,
   GetApiV1DataByApplicationIdHistoryData,
   GetApiV1DataByApplicationIdHistoryResponses,
   GetApiV1DataByApplicationIdResponses,
@@ -28,6 +31,7 @@ import type {
 
 import { client } from "./client.gen";
 import {
+  zGetApiV1DataByApplicationIdHistoryByVersionPath,
   zGetApiV1DataByApplicationIdHistoryPath,
   zGetApiV1DataByApplicationIdPath,
   zGetApiV1DataListQuery,
@@ -241,6 +245,33 @@ export class IntegrationsService {
           .parseAsync(data),
       responseType: "json",
       url: "/api/v1/data/{application_id}/history",
+      ...options,
+    });
+  }
+
+  /**
+   * Get Sync History Detail
+   *
+   * Get detailed information about a specific sync event
+   */
+  public static getApiV1DataByApplicationIdHistoryByVersion<ThrowOnError extends boolean = false>(
+    options: Options<GetApiV1DataByApplicationIdHistoryByVersionData, ThrowOnError>,
+  ) {
+    return (options.client ?? client).get<
+      GetApiV1DataByApplicationIdHistoryByVersionResponses,
+      GetApiV1DataByApplicationIdHistoryByVersionErrors,
+      ThrowOnError
+    >({
+      requestValidator: async (data) =>
+        await z
+          .object({
+            body: z.never().optional(),
+            path: zGetApiV1DataByApplicationIdHistoryByVersionPath,
+            query: z.never().optional(),
+          })
+          .parseAsync(data),
+      responseType: "json",
+      url: "/api/v1/data/{application_id}/history/{version}",
       ...options,
     });
   }

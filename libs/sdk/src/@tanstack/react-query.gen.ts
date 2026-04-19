@@ -10,6 +10,9 @@ import type {
   GetApiV1AuthMeResponse,
   GetApiV1DataByApplicationIdData,
   GetApiV1DataByApplicationIdError,
+  GetApiV1DataByApplicationIdHistoryByVersionData,
+  GetApiV1DataByApplicationIdHistoryByVersionError,
+  GetApiV1DataByApplicationIdHistoryByVersionResponse,
   GetApiV1DataByApplicationIdHistoryData,
   GetApiV1DataByApplicationIdHistoryResponse,
   GetApiV1DataByApplicationIdResponse,
@@ -264,6 +267,37 @@ export const getApiV1DataByApplicationIdHistoryOptions = (
       return data;
     },
     queryKey: getApiV1DataByApplicationIdHistoryQueryKey(options),
+  });
+
+export const getApiV1DataByApplicationIdHistoryByVersionQueryKey = (
+  options: Options<GetApiV1DataByApplicationIdHistoryByVersionData>,
+) =>
+  createQueryKey("getApiV1DataByApplicationIdHistoryByVersion", options, false, ["Integrations"]);
+
+/**
+ * Get Sync History Detail
+ *
+ * Get detailed information about a specific sync event
+ */
+export const getApiV1DataByApplicationIdHistoryByVersionOptions = (
+  options: Options<GetApiV1DataByApplicationIdHistoryByVersionData>,
+) =>
+  queryOptions<
+    GetApiV1DataByApplicationIdHistoryByVersionResponse,
+    AxiosError<GetApiV1DataByApplicationIdHistoryByVersionError>,
+    GetApiV1DataByApplicationIdHistoryByVersionResponse,
+    ReturnType<typeof getApiV1DataByApplicationIdHistoryByVersionQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await IntegrationsService.getApiV1DataByApplicationIdHistoryByVersion({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getApiV1DataByApplicationIdHistoryByVersionQueryKey(options),
   });
 
 /**

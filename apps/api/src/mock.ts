@@ -1,4 +1,4 @@
-import type { Integration, SyncEvent } from "./schema/integrations";
+import type { ApplicationId, Integration, SyncEvent } from "./schema/integrations";
 
 export const MOCK_USER = {
   id: "2998b136-c351-461e-a312-f8a8eed51f13",
@@ -65,4 +65,4 @@ export const INTEGRATIONS: Integration[] = [
 ];
 
 // In-memory storage for sync events
-export const SYNC_EVENTS: Record<string, SyncEvent[]> = {};
+export const SYNC_EVENTS: Partial<Record<ApplicationId, SyncEvent[]>> = {};

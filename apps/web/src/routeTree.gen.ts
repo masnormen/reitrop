@@ -13,7 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardApplicationIdIndexRouteImport } from './routes/dashboard/$applicationId/index'
 import { Route as DashboardApplicationIdResolveRouteImport } from './routes/dashboard/$applicationId/resolve'
-import { Route as DashboardApplicationIdHistoryRouteImport } from './routes/dashboard/$applicationId/history'
+import { Route as DashboardApplicationIdHistoryIndexRouteImport } from './routes/dashboard/$applicationId/history/index'
+import { Route as DashboardApplicationIdHistoryVersionRouteImport } from './routes/dashboard/$applicationId/history/$version'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -37,65 +38,78 @@ const DashboardApplicationIdResolveRoute =
     path: '/dashboard/$applicationId/resolve',
     getParentRoute: () => rootRouteImport,
   } as any)
-const DashboardApplicationIdHistoryRoute =
-  DashboardApplicationIdHistoryRouteImport.update({
-    id: '/dashboard/$applicationId/history',
-    path: '/dashboard/$applicationId/history',
+const DashboardApplicationIdHistoryIndexRoute =
+  DashboardApplicationIdHistoryIndexRouteImport.update({
+    id: '/dashboard/$applicationId/history/',
+    path: '/dashboard/$applicationId/history/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardApplicationIdHistoryVersionRoute =
+  DashboardApplicationIdHistoryVersionRouteImport.update({
+    id: '/dashboard/$applicationId/history/$version',
+    path: '/dashboard/$applicationId/history/$version',
     getParentRoute: () => rootRouteImport,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard/': typeof DashboardIndexRoute
-  '/dashboard/$applicationId/history': typeof DashboardApplicationIdHistoryRoute
   '/dashboard/$applicationId/resolve': typeof DashboardApplicationIdResolveRoute
   '/dashboard/$applicationId/': typeof DashboardApplicationIdIndexRoute
+  '/dashboard/$applicationId/history/$version': typeof DashboardApplicationIdHistoryVersionRoute
+  '/dashboard/$applicationId/history/': typeof DashboardApplicationIdHistoryIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardIndexRoute
-  '/dashboard/$applicationId/history': typeof DashboardApplicationIdHistoryRoute
   '/dashboard/$applicationId/resolve': typeof DashboardApplicationIdResolveRoute
   '/dashboard/$applicationId': typeof DashboardApplicationIdIndexRoute
+  '/dashboard/$applicationId/history/$version': typeof DashboardApplicationIdHistoryVersionRoute
+  '/dashboard/$applicationId/history': typeof DashboardApplicationIdHistoryIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard/': typeof DashboardIndexRoute
-  '/dashboard/$applicationId/history': typeof DashboardApplicationIdHistoryRoute
   '/dashboard/$applicationId/resolve': typeof DashboardApplicationIdResolveRoute
   '/dashboard/$applicationId/': typeof DashboardApplicationIdIndexRoute
+  '/dashboard/$applicationId/history/$version': typeof DashboardApplicationIdHistoryVersionRoute
+  '/dashboard/$applicationId/history/': typeof DashboardApplicationIdHistoryIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/dashboard/'
-    | '/dashboard/$applicationId/history'
     | '/dashboard/$applicationId/resolve'
     | '/dashboard/$applicationId/'
+    | '/dashboard/$applicationId/history/$version'
+    | '/dashboard/$applicationId/history/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
-    | '/dashboard/$applicationId/history'
     | '/dashboard/$applicationId/resolve'
     | '/dashboard/$applicationId'
+    | '/dashboard/$applicationId/history/$version'
+    | '/dashboard/$applicationId/history'
   id:
     | '__root__'
     | '/'
     | '/dashboard/'
-    | '/dashboard/$applicationId/history'
     | '/dashboard/$applicationId/resolve'
     | '/dashboard/$applicationId/'
+    | '/dashboard/$applicationId/history/$version'
+    | '/dashboard/$applicationId/history/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
-  DashboardApplicationIdHistoryRoute: typeof DashboardApplicationIdHistoryRoute
   DashboardApplicationIdResolveRoute: typeof DashboardApplicationIdResolveRoute
   DashboardApplicationIdIndexRoute: typeof DashboardApplicationIdIndexRoute
+  DashboardApplicationIdHistoryVersionRoute: typeof DashboardApplicationIdHistoryVersionRoute
+  DashboardApplicationIdHistoryIndexRoute: typeof DashboardApplicationIdHistoryIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -128,11 +142,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardApplicationIdResolveRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/$applicationId/history': {
-      id: '/dashboard/$applicationId/history'
+    '/dashboard/$applicationId/history/': {
+      id: '/dashboard/$applicationId/history/'
       path: '/dashboard/$applicationId/history'
-      fullPath: '/dashboard/$applicationId/history'
-      preLoaderRoute: typeof DashboardApplicationIdHistoryRouteImport
+      fullPath: '/dashboard/$applicationId/history/'
+      preLoaderRoute: typeof DashboardApplicationIdHistoryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$applicationId/history/$version': {
+      id: '/dashboard/$applicationId/history/$version'
+      path: '/dashboard/$applicationId/history/$version'
+      fullPath: '/dashboard/$applicationId/history/$version'
+      preLoaderRoute: typeof DashboardApplicationIdHistoryVersionRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -141,9 +162,12 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardIndexRoute: DashboardIndexRoute,
-  DashboardApplicationIdHistoryRoute: DashboardApplicationIdHistoryRoute,
   DashboardApplicationIdResolveRoute: DashboardApplicationIdResolveRoute,
   DashboardApplicationIdIndexRoute: DashboardApplicationIdIndexRoute,
+  DashboardApplicationIdHistoryVersionRoute:
+    DashboardApplicationIdHistoryVersionRoute,
+  DashboardApplicationIdHistoryIndexRoute:
+    DashboardApplicationIdHistoryIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

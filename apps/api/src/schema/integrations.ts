@@ -26,6 +26,8 @@ export type Integration = z.infer<typeof Integration>;
 export const ChangeType = z.enum(["ADD", "UPDATE", "DELETE"]);
 export type ChangeType = z.infer<typeof ChangeType>;
 
+// START External
+
 export const SyncChange = z.object({
   id: z.string(),
   field_name: z.string(),
@@ -40,12 +42,12 @@ export const SyncApproval = z.object({
   changes: z.array(SyncChange),
 });
 export type SyncApproval = z.infer<typeof SyncApproval>;
-
 export const SyncData = z.object({
   sync_approval: SyncApproval,
   metadata: z.record(z.string(), z.unknown()),
 });
 export type SyncData = z.infer<typeof SyncData>;
+// END External
 
 export const ConnectionStatus = z.enum(["connected", "disconnected", "pending", "error"]);
 export type ConnectionStatus = z.infer<typeof ConnectionStatus>;
@@ -53,12 +55,17 @@ export type ConnectionStatus = z.infer<typeof ConnectionStatus>;
 export const SyncEventStatus = z.enum(["pending", "accepted", "discarded", "failed"]);
 export type SyncEventStatus = z.infer<typeof SyncEventStatus>;
 
-export const SyncEvent = SyncChange.extend({
-  syncId: z.string(),
-  applicationId: ApplicationId,
-  timestamp: z.string(),
-  status: SyncEventStatus,
+export const SyncAction = z.object({
+  syncChange: SyncChange,
+  action: z.enum(["accept", "discard"]),
+});
+export type SyncAction = z.infer<typeof SyncAction>;
+
+export const SyncEvent = z.object({
   version: z.string(),
-  resolvedBy: z.string(),
+  applicationId: ApplicationId,
+  createdAt: z.string(),
+  createdBy: z.string(),
+  actions: z.array(SyncAction),
 });
 export type SyncEvent = z.infer<typeof SyncEvent>;

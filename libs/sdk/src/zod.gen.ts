@@ -69,6 +69,17 @@ export const zIntegration = z.object({
   version: z.string(),
 });
 
+export const zSyncAction = z.object({
+  syncChange: z.object({
+    id: z.string(),
+    field_name: z.string(),
+    change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
+    current_value: z.string().optional(),
+    new_value: z.string().optional(),
+  }),
+  action: z.enum(["accept", "discard"]),
+});
+
 export const zSyncApproval = z.object({
   application_name: z.string(),
   changes: z.array(
@@ -107,17 +118,22 @@ export const zSyncData = z.object({
 });
 
 export const zSyncEvent = z.object({
-  id: z.string(),
-  field_name: z.string(),
-  change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
-  current_value: z.string().optional(),
-  new_value: z.string().optional(),
-  syncId: z.string(),
-  applicationId: z.enum(["salesforce", "hubspot", "stripe", "slack", "zendesk", "intercom"]),
-  timestamp: z.string(),
-  status: z.enum(["pending", "accepted", "discarded", "failed"]),
   version: z.string(),
-  resolvedBy: z.string(),
+  applicationId: z.enum(["salesforce", "hubspot", "stripe", "slack", "zendesk", "intercom"]),
+  createdAt: z.string(),
+  createdBy: z.string(),
+  actions: z.array(
+    z.object({
+      syncChange: z.object({
+        id: z.string(),
+        field_name: z.string(),
+        change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
+        current_value: z.string().optional(),
+        new_value: z.string().optional(),
+      }),
+      action: z.enum(["accept", "discard"]),
+    }),
+  ),
 });
 
 export const zSyncEventStatus = z.enum(["pending", "accepted", "discarded", "failed"]);
@@ -275,7 +291,7 @@ export const zGetApiV1DataByApplicationIdResponse = z.object({
 });
 
 export const zGetApiV1DataByApplicationIdHistoryPath = z.object({
-  application_id: z.string(),
+  application_id: z.enum(["salesforce", "hubspot", "stripe", "slack", "zendesk", "intercom"]),
 });
 
 /**
@@ -285,32 +301,64 @@ export const zGetApiV1DataByApplicationIdHistoryResponse = z.object({
   ok: z.literal(true),
   data: z.array(
     z.object({
-      id: z.string(),
-      field_name: z.string(),
-      change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
-      current_value: z.string().optional(),
-      new_value: z.string().optional(),
-      syncId: z.string(),
-      applicationId: z.enum(["salesforce", "hubspot", "stripe", "slack", "zendesk", "intercom"]),
-      timestamp: z.string(),
-      status: z.enum(["pending", "accepted", "discarded", "failed"]),
       version: z.string(),
-      resolvedBy: z.string(),
+      applicationId: z.enum(["salesforce", "hubspot", "stripe", "slack", "zendesk", "intercom"]),
+      createdAt: z.string(),
+      createdBy: z.string(),
+      added: z.number(),
+      updated: z.number(),
+      deleted: z.number(),
     }),
   ),
   message: z.enum(["Success"]),
   requestId: z.string(),
 });
 
-export const zPostApiV1DataByApplicationIdResolveBody = z.object({
-  syncChange: z.object({
-    id: z.string(),
-    field_name: z.string(),
-    change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
-    current_value: z.string().optional(),
-    new_value: z.string().optional(),
+export const zGetApiV1DataByApplicationIdHistoryByVersionPath = z.object({
+  application_id: z.enum(["salesforce", "hubspot", "stripe", "slack", "zendesk", "intercom"]),
+  version: z.string(),
+});
+
+/**
+ * A successful response object
+ */
+export const zGetApiV1DataByApplicationIdHistoryByVersionResponse = z.object({
+  ok: z.literal(true),
+  data: z.object({
+    version: z.string(),
+    applicationId: z.enum(["salesforce", "hubspot", "stripe", "slack", "zendesk", "intercom"]),
+    createdAt: z.string(),
+    createdBy: z.string(),
+    actions: z.array(
+      z.object({
+        syncChange: z.object({
+          id: z.string(),
+          field_name: z.string(),
+          change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
+          current_value: z.string().optional(),
+          new_value: z.string().optional(),
+        }),
+        action: z.enum(["accept", "discard"]),
+      }),
+    ),
   }),
-  action: z.enum(["accept", "discard"]),
+  message: z.enum(["Success"]),
+  requestId: z.string(),
+});
+
+export const zPostApiV1DataByApplicationIdResolveBody = z.object({
+  syncActions: z.array(
+    z.object({
+      syncChange: z.object({
+        id: z.string(),
+        field_name: z.string(),
+        change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
+        current_value: z.string().optional(),
+        new_value: z.string().optional(),
+      }),
+      action: z.enum(["accept", "discard"]),
+    }),
+  ),
 });
 
 export const zPostApiV1DataByApplicationIdResolvePath = z.object({
@@ -323,17 +371,22 @@ export const zPostApiV1DataByApplicationIdResolvePath = z.object({
 export const zPostApiV1DataByApplicationIdResolveResponse = z.object({
   ok: z.literal(true),
   data: z.object({
-    id: z.string(),
-    field_name: z.string(),
-    change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
-    current_value: z.string().optional(),
-    new_value: z.string().optional(),
-    syncId: z.string(),
-    applicationId: z.enum(["salesforce", "hubspot", "stripe", "slack", "zendesk", "intercom"]),
-    timestamp: z.string(),
-    status: z.enum(["pending", "accepted", "discarded", "failed"]),
     version: z.string(),
-    resolvedBy: z.string(),
+    applicationId: z.enum(["salesforce", "hubspot", "stripe", "slack", "zendesk", "intercom"]),
+    createdAt: z.string(),
+    createdBy: z.string(),
+    actions: z.array(
+      z.object({
+        syncChange: z.object({
+          id: z.string(),
+          field_name: z.string(),
+          change_type: z.enum(["ADD", "UPDATE", "DELETE"]),
+          current_value: z.string().optional(),
+          new_value: z.string().optional(),
+        }),
+        action: z.enum(["accept", "discard"]),
+      }),
+    ),
   }),
   message: z.enum(["Success"]),
   requestId: z.string(),

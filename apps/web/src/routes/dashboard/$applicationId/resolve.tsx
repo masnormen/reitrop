@@ -6,9 +6,10 @@ import {
   getApiV1AuthMeOptions,
   getApiV1DataByApplicationIdOptions,
   getApiV1DataSyncOptions,
+  postApiV1DataByApplicationIdResolveMutation,
 } from "@repo/sdk/query";
 import { zApplicationId, zSyncChange } from "@repo/sdk/zod";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { clsx } from "clsx";
 import { sortBy } from "es-toolkit";
@@ -97,7 +98,9 @@ function ResolvePage() {
           <ArrowLeft className="mr-4 size-8" />
         </Link>
         <div>
-          <h1 className="text-3xl font-bold">Resolve Changes</h1>
+          <h1 className="text-3xl font-bold">
+            {integration?.data.name || applicationId} / Resolve Changes
+          </h1>
           <p className="text-muted-foreground">
             Review and resolve pending changes for {integration?.data.name || applicationId}{" "}
             integration
@@ -154,6 +157,9 @@ function ResolveError({
 }
 
 function ResolveContent({ changes }: { changes: SyncChange[] }) {
+  const { applicationId } = Route.useParams();
+  const navigate = Route.useNavigate();
+
   const {
     handleSubmit,
     setValue,
@@ -178,6 +184,8 @@ function ResolveContent({ changes }: { changes: SyncChange[] }) {
     ),
   });
 
+  const resolveMutation = useMutation(postApiV1DataByApplicationIdResolveMutation());
+
   const watchedValues = useWatch({
     control,
   });
@@ -188,15 +196,39 @@ function ResolveContent({ changes }: { changes: SyncChange[] }) {
   }));
 
   const onSubmit = async (data: Record<string, ResolveChange>) => {
-    void confirm({
+    // Validate that all changes have an action selected
+    if (Object.values(data).some((v) => v.action == null)) {
+      await confirm({
+        title: "Unresolved Changes",
+        content:
+          "Some changes do not have an action selected. Please choose an action for all changes before submitting.",
+      });
+      return;
+    }
+
+    const confirmed = await confirm({
       title: "Submit Resolutions",
-      content: (
-        <pre>
-          <code>{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+      content: "Are you sure you want to submit your resolutions?",
     });
+    if (!confirmed) return;
+
+    await resolveMutation.mutateAsync({
+      path: { application_id: applicationId },
+      body: {
+        syncActions: Object.values(data).map(({ action, ...change }) => ({
+          syncChange: change,
+          action: action!,
+        })),
+      },
+    });
+
+    await confirm({
+      title: "Resolutions Submitted",
+      content: "Your resolutions have been submitted successfully.",
+    });
+    await navigate({ to: "/dashboard/$applicationId/history", params: { applicationId } });
   };
+
   const onError = () => {
     void confirm({
       title: "Error",

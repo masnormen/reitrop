@@ -1,11 +1,14 @@
 import { createRoute, z } from "@hono/zod-openapi";
+import dayjs from "dayjs";
+import { sortBy } from "es-toolkit";
 import { jsonContentRequired } from "stoker/openapi/helpers";
 
 import { createV1RouteApp } from "@/app/v1.factory";
-import { okRes, zOkRes } from "@/lib/response";
+import { ApiError } from "@/lib/error";
+import { errorContent, okRes, zOkRes } from "@/lib/response";
 import { HttpStatusCodes } from "@/lib/status-code";
 import { INTEGRATIONS, SYNC_EVENTS } from "@/mock";
-import { ApplicationId, Integration, SyncChange, SyncData, SyncEvent } from "@/schema/integrations";
+import { ApplicationId, Integration, SyncAction, SyncData, SyncEvent } from "@/schema/integrations";
 
 const EXTERNAL_API_URL = "https://portier-takehometest.onrender.com/api/v1/data/sync";
 
@@ -26,8 +29,7 @@ const SyncErrorResponse = z.object({
 const IntegrationListResponseSchema = z.array(Integration);
 
 export const ResolveRequest = z.object({
-  syncChange: SyncChange,
-  action: z.enum(["accept", "discard"]),
+  syncActions: z.array(SyncAction),
 });
 
 export const ResolveResponse = SyncEvent;
@@ -170,12 +172,25 @@ const integrationRoutes = createV1RouteApp()
       path: "/{application_id}/history",
       request: {
         params: z.object({
-          application_id: z.string(),
+          application_id: ApplicationId,
         }),
       },
       responses: {
         [HttpStatusCodes.OK]: jsonContentRequired(
-          zOkRes(z.array(SyncEvent)),
+          zOkRes(
+            z.array(
+              SyncEvent.pick({
+                version: true,
+                applicationId: true,
+                createdAt: true,
+                createdBy: true,
+              }).extend({
+                added: z.number(),
+                updated: z.number(),
+                deleted: z.number(),
+              }),
+            ),
+          ),
           "Returns sync history",
         ),
       },
@@ -183,9 +198,55 @@ const integrationRoutes = createV1RouteApp()
     async (c) => {
       const { application_id } = c.req.valid("param");
 
-      const events = SYNC_EVENTS[application_id] || [];
+      const events = (SYNC_EVENTS[application_id] || []).map((event) => ({
+        version: event.version,
+        applicationId: event.applicationId,
+        createdAt: event.createdAt,
+        createdBy: event.createdBy,
+        added: event.actions.filter(
+          (a) => a.action === "accept" && a.syncChange.change_type === "ADD",
+        ).length,
+        updated: event.actions.filter(
+          (a) => a.action === "accept" && a.syncChange.change_type === "UPDATE",
+        ).length,
+        deleted: event.actions.filter(
+          (a) => a.action === "accept" && a.syncChange.change_type === "DELETE",
+        ).length,
+      }));
 
       return c.json(okRes(events, c.var.requestId), HttpStatusCodes.OK);
+    },
+  )
+  /**
+   * Get Sync History
+   */
+  .openapi(
+    createRoute({
+      tags: ["Integrations"],
+      summary: "Get Sync History Detail",
+      description: "Get detailed information about a specific sync event",
+      method: "get",
+      path: "/{application_id}/history/{version}",
+      request: {
+        params: z.object({
+          application_id: ApplicationId,
+          version: z.string(),
+        }),
+      },
+      responses: {
+        [HttpStatusCodes.OK]: jsonContentRequired(zOkRes(SyncEvent), "Returns sync event details"),
+        ...errorContent(["NOT_FOUND"]),
+      },
+    }),
+    async (c) => {
+      const { application_id, version } = c.req.valid("param");
+
+      const event = (SYNC_EVENTS[application_id] || []).find((event) => event.version === version);
+      if (!event) {
+        throw ApiError.NOT_FOUND;
+      }
+
+      return c.json(okRes(event, c.var.requestId), HttpStatusCodes.OK);
     },
   )
   /**
@@ -219,24 +280,30 @@ const integrationRoutes = createV1RouteApp()
     }),
     async (c) => {
       const { application_id } = c.req.valid("param");
-      const { syncChange, action } = c.req.valid("json");
+      const { syncActions } = c.req.valid("json");
 
       // Fetch current sync data to get the changes
       const externalUrl = new URL(EXTERNAL_API_URL);
       externalUrl.searchParams.set("application_id", application_id);
 
-      // Create sync event record
-      const syncId = `sync_${Date.now()}_${application_id}`;
-      const integration = INTEGRATIONS.find((i) => i.id === application_id);
+      const lastVersion =
+        sortBy(SYNC_EVENTS[application_id] ?? [], ["version"]).at(-1)?.version || null;
+
+      const version = (() => {
+        const todayString = dayjs().format("YYYYMMDD");
+        if (lastVersion && lastVersion.startsWith(todayString)) {
+          const lastIncrement = parseInt(lastVersion.split(".")[1]!, 10);
+          return `${todayString}.${String(lastIncrement + 1).padStart(2, "0")}`;
+        }
+        return `${todayString}.01`;
+      })();
 
       const syncEvent: SyncEvent = {
-        syncId,
+        version,
         applicationId: application_id,
-        timestamp: new Date().toISOString(),
-        status: action === "accept" ? "accepted" : "discarded",
-        version: integration?.version || "unknown",
-        resolvedBy: c.var.session?.user.id || "",
-        ...syncChange,
+        actions: syncActions,
+        createdAt: new Date().toISOString(),
+        createdBy: c.var.session?.user.id || "",
       };
 
       // Store the event

@@ -41,14 +41,14 @@ const ConfirmDialog = ({
           <div className="no-scrollbar -mx-4 max-h-[50vh] overflow-y-auto px-4">{content}</div>
         )}
         <DialogFooter className="justify-end">
-          {(cancelText || (!confirmText && !cancelText)) && (
+          {cancelText && (
             <Button type="button" variant="outline" onClick={() => proceed(false)}>
-              {cancelText ?? (!confirmText ? "OK" : null)}
+              {cancelText}
             </Button>
           )}
-          {confirmText && (
+          {(confirmText || (!confirmText && !cancelText)) && (
             <Button type="button" onClick={() => proceed(true)}>
-              {confirmText}
+              {confirmText ?? (!cancelText ? "OK" : null)}
             </Button>
           )}
         </DialogFooter>
