@@ -42,6 +42,8 @@ You still have to do the steps above (fill in the `.env` file). Then, you can ru
 
 ```bash
 pnpm compose:up
+# OR
+docker compose up --build --force-recreate --no-deps
 ```
 
 #### App access
