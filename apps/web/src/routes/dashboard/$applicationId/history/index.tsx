@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import dayjs from "dayjs";
 import { sortBy } from "es-toolkit";
-import { Clock, ArrowLeft, ChevronRight } from "lucide-react";
+import { Clock, ArrowLeft, ChevronRight, Plus, Minus, Edit3 } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -96,7 +96,7 @@ function HistoryListContent({ applicationId }: { applicationId: ApplicationId })
         </CardContent>
       </Card>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
         {events.map((event) => {
           const totalChanges = event.added + event.updated + event.deleted;
 
@@ -106,43 +106,64 @@ function HistoryListContent({ applicationId }: { applicationId: ApplicationId })
               to="/dashboard/$applicationId/history/$version"
               params={{ applicationId, version: event.version }}
             >
-              <Card className="group gap-0 hover:border-primary/50">
-                <div className="flex items-center justify-between border-b px-3 pb-3 transition-colors">
-                  <div className="flex items-center gap-2">
-                    <Clock className="size-3.5 text-muted-foreground" />
-                    <span className="text-sm font-medium text-muted-foreground">
-                      Version {event.version}
-                    </span>
-                    <span className="rounded bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-                      {totalChanges} change{totalChanges !== 1 ? "s" : ""}
-                    </span>
+              <Card className="group gap-0 transition-all hover:border-primary/50 hover:shadow-md">
+                <div className="flex items-center justify-between border-b px-4 pb-4 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <Clock className="size-4 text-muted-foreground" />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold">Version {event.version}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {dayjs(event.createdAt).format("MMM DD, YYYY · HH:mm")}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>{dayjs(event.createdAt).format("MMM DD, YYYY HH:mm")}</span>
-                    <span>·</span>
-                    <span>by {event.createdBy}</span>
-                    <ChevronRight className="size-3" />
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <span>by {event.createdBy}</span>
+                    </div>
+                    <ChevronRight className="size-4 text-muted-foreground group-hover:text-foreground" />
                   </div>
                 </div>
 
-                <div className="p-3">
-                  <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-                    {event.added > 0 && (
-                      <span className="inline-flex items-center gap-1">
-                        <span className="font-medium text-green-700">{event.added}</span> added
-                      </span>
-                    )}
-                    {event.updated > 0 && (
-                      <span className="inline-flex items-center gap-1">
-                        <span className="font-medium text-amber-700">{event.updated}</span> updated
-                      </span>
-                    )}
-                    {event.deleted > 0 && (
-                      <span className="inline-flex items-center gap-1">
-                        <span className="font-medium text-red-700">{event.deleted}</span> deleted
-                      </span>
-                    )}
-                  </div>
+                <div className="flex items-center gap-4 px-4 pt-4">
+                  {event.added > 0 && (
+                    <div className="flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2">
+                      <Plus className="size-4 text-green-700" />
+                      <div className="flex flex-col">
+                        <span className="text-lg font-semibold text-green-700">{event.added}</span>
+                        <span className="text-[10px] font-medium text-green-600 uppercase">
+                          records added
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  {event.updated > 0 && (
+                    <div className="flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2">
+                      <Edit3 className="size-4 text-amber-700" />
+                      <div className="flex flex-col">
+                        <span className="text-lg font-semibold text-amber-700">
+                          {event.updated}
+                        </span>
+                        <span className="text-[10px] font-medium text-amber-600 uppercase">
+                          records updated
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  {event.deleted > 0 && (
+                    <div className="flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2">
+                      <Minus className="size-4 text-red-700" />
+                      <div className="flex flex-col">
+                        <span className="text-lg font-semibold text-red-700">{event.deleted}</span>
+                        <span className="text-[10px] font-medium text-red-600 uppercase">
+                          records deleted
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  {totalChanges === 0 && (
+                    <span className="text-xs text-muted-foreground">No changes recorded</span>
+                  )}
                 </div>
               </Card>
             </Link>
@@ -162,20 +183,24 @@ function HistoryListSkeleton() {
         </CardContent>
       </Card>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
         {Array.from({ length: 3 }).map((_, i) => (
           <Card key={i} className="group gap-0">
-            <div className="flex items-center justify-between border-b px-3 pb-3">
-              <div className="flex items-center gap-2">
-                <Skeleton className="size-3.5" />
-                <Skeleton className="h-3.5 w-32" />
-                <Skeleton className="h-4 w-16 rounded" />
+            <div className="flex items-center justify-between border-b px-4 py-3">
+              <div className="flex items-center gap-3">
+                <Skeleton className="size-4" />
+                <div className="flex flex-col gap-1">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-40" />
+                </div>
               </div>
-              <Skeleton className="h-3 w-40" />
+              <Skeleton className="h-4 w-24" />
             </div>
 
-            <div className="p-3">
-              <Skeleton className="h-4 w-48" />
+            <div className="flex items-center gap-4 px-4 py-3">
+              <Skeleton className="h-12 w-20 rounded-lg" />
+              <Skeleton className="h-12 w-20 rounded-lg" />
+              <Skeleton className="h-12 w-20 rounded-lg" />
             </div>
           </Card>
         ))}

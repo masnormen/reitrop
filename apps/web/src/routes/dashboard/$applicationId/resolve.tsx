@@ -4,7 +4,9 @@ import type { AxiosError } from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   getApiV1AuthMeOptions,
+  getApiV1DataByApplicationIdHistoryOptions,
   getApiV1DataByApplicationIdOptions,
+  getApiV1DataListOptions,
   getApiV1DataSyncOptions,
   postApiV1DataByApplicationIdResolveMutation,
 } from "@repo/sdk/query";
@@ -14,6 +16,7 @@ import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-route
 import { clsx } from "clsx";
 import { sortBy } from "es-toolkit";
 import { Check, X, FileDiff, Plus, Minus, ArrowLeft, Trash2, RefreshCcw } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
@@ -93,7 +96,7 @@ function ResolvePage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-8 flex flex-row items-center">
+      <div className="mb-4 flex flex-row items-center">
         <Link to="/dashboard/$applicationId" params={{ applicationId }}>
           <ArrowLeft className="mr-4 size-8" />
         </Link>
@@ -184,7 +187,27 @@ function ResolveContent({ changes }: { changes: SyncChange[] }) {
     ),
   });
 
-  const resolveMutation = useMutation(postApiV1DataByApplicationIdResolveMutation());
+  const resolveMutation = useMutation({
+    ...postApiV1DataByApplicationIdResolveMutation(),
+    onSuccess: async (_data, _var, _, context) => {
+      // Invalidate history queries
+      await context.client.invalidateQueries({
+        queryKey: getApiV1DataByApplicationIdHistoryOptions({
+          path: { application_id: applicationId },
+        }).queryKey,
+      });
+      // Invalidate integration details query to update last synced at
+      await context.client.invalidateQueries({
+        queryKey: getApiV1DataByApplicationIdOptions({
+          path: { application_id: applicationId },
+        }).queryKey,
+      });
+      // Invalidate application list
+      await context.client.invalidateQueries({
+        queryKey: getApiV1DataListOptions().queryKey,
+      });
+    },
+  });
 
   const watchedValues = useWatch({
     control,
@@ -236,6 +259,18 @@ function ResolveContent({ changes }: { changes: SyncChange[] }) {
     });
   };
 
+  const handleAcceptAll = () => {
+    changes.forEach((change) => {
+      setValue(`${change.id}.action`, "accept");
+    });
+  };
+
+  const handleDiscardAll = () => {
+    changes.forEach((change) => {
+      setValue(`${change.id}.action`, "discard");
+    });
+  };
+
   if (!changes || changes.length === 0) {
     return (
       <Card>
@@ -246,11 +281,63 @@ function ResolveContent({ changes }: { changes: SyncChange[] }) {
     );
   }
 
+  const headerRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLDivElement>(null);
+  // detect when headerRef is on top of the viewport (stickying)
+  const [isHeaderSticky, setIsHeaderSticky] = useState(false);
+  const [isFooterSticky, setIsFooterSticky] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      if (headerRef.current) {
+        const { top } = headerRef.current.getBoundingClientRect();
+        setIsHeaderSticky(top <= 0);
+      }
+      if (footerRef.current) {
+        const { bottom } = footerRef.current.getBoundingClientRect();
+        setIsFooterSticky(bottom >= window.innerHeight);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
-    <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6">
-      <Card className="gap-0 border-muted">
-        <CardContent>
-          {changes.length} change{changes.length !== 1 ? "s" : ""} pending review
+    <form onSubmit={handleSubmit(onSubmit, onError)} className="relative space-y-6">
+      <Card
+        ref={headerRef}
+        className={clsx(
+          "sticky top-0 gap-0 border-muted",
+          isHeaderSticky && "rounded-t-none! shadow-lg",
+        )}
+      >
+        <CardContent className="flex items-center justify-between px-4">
+          <span>
+            {changes.length} change{changes.length !== 1 ? "s" : ""} pending review
+          </span>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleDiscardAll}
+              className="border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
+            >
+              <X className="mr-2 size-4" />
+              Discard All
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleAcceptAll}
+              className="border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800"
+            >
+              <Check className="mr-2 size-4" />
+              Accept All
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
@@ -265,10 +352,16 @@ function ResolveContent({ changes }: { changes: SyncChange[] }) {
         ))}
       </div>
 
-      <Card className="border-primary/50 bg-primary/5">
+      <Card
+        ref={footerRef}
+        className={clsx(
+          "sticky bottom-0 border-primary/50 bg-taupe-50",
+          isFooterSticky && "rounded-b-none! shadow-lg",
+        )}
+      >
         <CardContent className="flex items-center justify-between p-4">
           <div>
-            <p className="font-medium">Ready to submit</p>
+            <p className="font-medium">Summary:</p>
             <p className="text-sm text-muted-foreground">
               {Object.values(watchedValues).filter((v) => v?.action === "accept").length} accepted,{" "}
               {Object.values(watchedValues).filter((v) => v?.action === "discard").length}{" "}
@@ -411,8 +504,12 @@ function ResolveSkeleton() {
   return (
     <div className="space-y-6">
       <Card className="gap-0 border-muted">
-        <CardContent>
+        <CardContent className="flex items-center justify-between p-4">
           <Skeleton className="h-4 w-32" />
+          <div className="flex gap-2">
+            <Skeleton className="h-9 w-28" />
+            <Skeleton className="h-9 w-28" />
+          </div>
         </CardContent>
       </Card>
 

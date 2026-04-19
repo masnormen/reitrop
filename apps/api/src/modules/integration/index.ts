@@ -310,6 +310,12 @@ const integrationRoutes = createV1RouteApp()
       SYNC_EVENTS[application_id] ??= [];
       SYNC_EVENTS[application_id].push(syncEvent);
 
+      // Update last sync result in integration data
+      const integration = INTEGRATIONS.find((i) => i.id === application_id);
+      if (integration) {
+        integration.lastSyncedAt = new Date().toISOString();
+      }
+
       return c.json(okRes(syncEvent, c.var.requestId), HttpStatusCodes.OK);
     },
   );
