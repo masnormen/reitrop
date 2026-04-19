@@ -162,7 +162,10 @@ function HistoryListContent({ applicationId }: { applicationId: ApplicationId })
                     </div>
                   )}
                   {totalChanges === 0 && (
-                    <span className="text-xs text-muted-foreground">No changes recorded</span>
+                    <span className="text-xs text-muted-foreground">
+                      No changes, but discarded changes are recorded for audit purposes. Click to
+                      view details.
+                    </span>
                   )}
                 </div>
               </Card>

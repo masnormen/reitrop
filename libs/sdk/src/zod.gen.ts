@@ -65,7 +65,7 @@ export const zIntegration = z.object({
   name: z.string(),
   emoji: z.string(),
   status: z.enum(["synced", "syncing", "conflict", "error"]),
-  lastSyncedAt: z.string(),
+  lastSyncedAt: z.union([z.string(), z.unknown()]),
   version: z.string(),
 });
 
@@ -234,7 +234,7 @@ export const zGetApiV1DataListResponse = z.object({
       name: z.string(),
       emoji: z.string(),
       status: z.enum(["synced", "syncing", "conflict", "error"]),
-      lastSyncedAt: z.string(),
+      lastSyncedAt: z.union([z.string(), z.unknown()]),
       version: z.string(),
     }),
   ),
@@ -283,7 +283,7 @@ export const zGetApiV1DataByApplicationIdResponse = z.object({
     name: z.string(),
     emoji: z.string(),
     status: z.enum(["synced", "syncing", "conflict", "error"]),
-    lastSyncedAt: z.string(),
+    lastSyncedAt: z.union([z.string(), z.unknown()]),
     version: z.string(),
   }),
   message: z.enum(["Success"]),

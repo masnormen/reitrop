@@ -46,7 +46,11 @@ const columns: ColumnDef<Integration>[] = [
     header: "Last Synced",
     size: 25,
     cell: ({ row }) => (
-      <span className="text-sm text-muted-foreground">{dayjs().to(row.original.lastSyncedAt)}</span>
+      <span className="text-sm text-muted-foreground">
+        {typeof row.original.lastSyncedAt === "string"
+          ? dayjs().to(row.original.lastSyncedAt)
+          : "Never"}
+      </span>
     ),
   },
   {

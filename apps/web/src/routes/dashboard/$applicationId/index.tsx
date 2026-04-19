@@ -126,7 +126,9 @@ function IntegrationDetailContent({ applicationId }: { applicationId: Applicatio
             <div>
               <p className="text-sm font-medium text-muted-foreground">Last Synced</p>
               <p className="mt-1 text-sm">
-                {dayjs(integration.data.lastSyncedAt).format("MMMM DD, YYYY HH:mm")}
+                {typeof integration.data.lastSyncedAt === "string"
+                  ? dayjs().to(integration.data.lastSyncedAt)
+                  : "Never"}
               </p>
             </div>
           </div>

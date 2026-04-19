@@ -18,7 +18,7 @@ export const Integration = z.object({
   name: z.string(),
   emoji: z.string(),
   status: SyncStatus,
-  lastSyncedAt: z.string(),
+  lastSyncedAt: z.union([z.string(), z.null()]),
   version: z.string(),
 });
 export type Integration = z.infer<typeof Integration>;

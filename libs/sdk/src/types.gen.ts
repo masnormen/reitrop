@@ -64,7 +64,7 @@ export type Integration = {
   name: string;
   emoji: string;
   status: "synced" | "syncing" | "conflict" | "error";
-  lastSyncedAt: string;
+  lastSyncedAt: string | unknown;
   version: string;
 };
 
@@ -435,7 +435,7 @@ export type GetApiV1DataListResponses = {
       name: string;
       emoji: string;
       status: "synced" | "syncing" | "conflict" | "error";
-      lastSyncedAt: string;
+      lastSyncedAt: string | unknown;
       version: string;
     }>;
     /**
@@ -539,7 +539,7 @@ export type GetApiV1DataByApplicationIdResponses = {
       name: string;
       emoji: string;
       status: "synced" | "syncing" | "conflict" | "error";
-      lastSyncedAt: string;
+      lastSyncedAt: string | unknown;
       version: string;
     };
     /**
