@@ -85,7 +85,6 @@ function ResolvePage() {
       query: { application_id: applicationId },
     }),
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
     retry: false,
   });
 
