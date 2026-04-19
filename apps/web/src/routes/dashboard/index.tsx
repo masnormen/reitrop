@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { IntegrationsTable } from "@/components/integrations/integrations-table";
+import { ProfileCard } from "@/components/profile-card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/dashboard/")({
   ssr: false,
@@ -26,23 +28,11 @@ function DashboardPage() {
         <p className="text-muted-foreground">Welcome back, {user?.data.name}!</p>
       </div>
 
-      <div className="mb-8 rounded-lg border p-6">
-        <h2 className="mb-2 text-lg font-semibold">Profile Information</h2>
-        <div className="space-y-2 text-sm">
-          <div>
-            <span className="font-medium">Name:</span> {user?.data.name}
-          </div>
-          <div>
-            <span className="font-medium">Email:</span> {user?.data.email}
-          </div>
-          <div>
-            <span className="font-medium">Role:</span> {user?.data.role}
-          </div>
-          <div>
-            <span className="font-medium">Status:</span> {user?.data.status}
-          </div>
-        </div>
-      </div>
+      {user ? (
+        <ProfileCard user={user.data} />
+      ) : (
+        <Skeleton className="mb-8 h-24 w-full rounded-lg" />
+      )}
 
       <IntegrationsTable />
     </div>

@@ -6,10 +6,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useDebounce } from "ahooks";
 import dayjs from "dayjs";
+import { Search } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { StatusChip } from "@/components/ui/status-chip";
 
 interface IntegrationsTableProps {
@@ -97,26 +99,7 @@ export function IntegrationsTable({ initialSearch }: IntegrationsTableProps) {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Integrations</h2>
         <div className="relative w-64">
-          <input
-            type="text"
-            placeholder="Search integrations..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-background ring-offset-background w-full rounded-md border border-input px-4 py-2 pl-10 text-sm placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-          />
-          <svg
-            className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
+          <IntegrationsTableSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         </div>
       </div>
 
@@ -137,3 +120,26 @@ export function IntegrationsTable({ initialSearch }: IntegrationsTableProps) {
     </div>
   );
 }
+
+const IntegrationsTableSearch = ({
+  searchQuery,
+  setSearchQuery,
+}: {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+}) => {
+  return (
+    <div className="relative w-64">
+      <InputGroup>
+        <InputGroupInput
+          placeholder="Search integrations..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <InputGroupAddon align="inline-end">
+          <Search />
+        </InputGroupAddon>
+      </InputGroup>
+    </div>
+  );
+};
