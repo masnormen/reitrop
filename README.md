@@ -25,22 +25,22 @@ pnpm install
 pnpm dev
 ```
 
-## Run the project with Docker Compose
+### Run the project with Docker Compose
 
-I have basically 2 applications (API for mocking and Web). I provided a docker compose configuration to run both of them together. You can run the following command to start both applications:
+If you prefer containerized development, you can run both applications together using Docker Compose. You still have to do the steps above. You can run the following command to start both applications:
 
+```bash
+pnpm compose:up
 ```
-docker compose up
-```
 
-### Run Docker build
+### (Optional) Run Docker build
 
 ```bash
 docker build -f apps/api/Dockerfile . --progress=plain -t starter-api
 docker build -f apps/web/Dockerfile . --progress=plain -t starter-web
 ```
 
-### Running built Docker images
+### (Optional) Running built Docker images
 
 ```bash
 docker run -p 4200:4200 starter-api

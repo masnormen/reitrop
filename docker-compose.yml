@@ -5,6 +5,7 @@ services:
       dockerfile: apps/api/Dockerfile
       args:
         APP_NAME: api
+      no_cache: true
     ports:
       - "4200:4200"
 
@@ -14,6 +15,7 @@ services:
       dockerfile: apps/web/Dockerfile
       args:
         APP_NAME: web
+      no_cache: true
     ports:
       - "3000:3000"
     depends_on:
