@@ -7,11 +7,12 @@ import { RESET } from "jotai/utils";
 import { sessionJwtAtom } from "@/atoms/index";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function Navbar() {
   const router = useRouter();
 
-  const { data: user, error } = useQuery({ ...getApiV1AuthMeOptions(), retry: false });
+  const { data: user, status } = useQuery({ ...getApiV1AuthMeOptions(), retry: false });
   const setSessionJwt = useSetAtom(sessionJwtAtom);
 
   const handleLogout = async () => {
@@ -40,7 +41,7 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          {user && !error ? (
+          {status === "success" ? (
             <>
               <div className="flex items-center gap-2">
                 <Avatar>
@@ -58,6 +59,10 @@ export function Navbar() {
                 Logout
               </Button>
             </>
+          ) : status === "pending" ? (
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-4 w-50" />
+            </div>
           ) : (
             <Link to="/">
               <Button size="sm">Login</Button>
