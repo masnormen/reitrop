@@ -25,6 +25,11 @@ pnpm install
 pnpm dev
 ```
 
+#### Credentials:
+
+- Email: admin@admin.com
+- Password: password
+
 ### Run the project with Docker Compose
 
 If you prefer containerized development, you can run both applications together using Docker Compose. You still have to do the steps above. You can run the following command to start both applications:
@@ -32,6 +37,11 @@ If you prefer containerized development, you can run both applications together 
 ```bash
 pnpm compose:up
 ```
+
+#### Credentials:
+
+- Email: admin@admin.com
+- Password: password
 
 ### (Optional) Run Docker build
 
@@ -46,6 +56,26 @@ docker build -f apps/web/Dockerfile . --progress=plain -t starter-web
 docker run -p 4200:4200 starter-api
 docker run -p 3000:3000 starter-web
 ```
+
+# Design Decisions
+
+**Tech Stack Rationale**:
+
+- I chose React 19 with TanStack Start over Next.js for the amazing TS safety and no vendor lock-in.
+- Hono.js was selected for quick prototyping with good OpenAPI support.
+- Using @hey/openapi-ts for type-safe API client generation, so FE and BE have shared schemas and types.
+
+**Architecture Pattern**:
+
+- Monorepo with Turborepo, with shared configs.
+- Automated SDK generation ensures shared types across frontend/backend via auto-generated SDK from OpenAPI specs.
+
+**Developer Experience**:
+
+- Oxlint and Oxfmt provide fast linting, suitable for LLM to quickly check their outputs. Supported with git hooks (husky) for pre-commit linting and formatting.
+- Docker Compose setup allows for easy local development without worrying about environment setup.
+
+---
 
 # Assumptions
 
