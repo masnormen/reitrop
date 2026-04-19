@@ -248,7 +248,7 @@ export class IntegrationsService {
   /**
    * Resolve Sync Changes
    *
-   * Approve or reject sync changes
+   * Accept or discard sync changes
    */
   public static postApiV1DataByApplicationIdResolve<ThrowOnError extends boolean = false>(
     options: Options<PostApiV1DataByApplicationIdResolveData, ThrowOnError>,

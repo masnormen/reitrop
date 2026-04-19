@@ -1,5 +1,3 @@
-"use client";
-
 import { getApiV1AuthMeOptions, postApiV1AuthLoginMutation } from "@repo/sdk/query";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";

@@ -115,12 +115,12 @@ export const zSyncEvent = z.object({
   syncId: z.string(),
   applicationId: z.enum(["salesforce", "hubspot", "stripe", "slack", "zendesk", "intercom"]),
   timestamp: z.string(),
-  status: z.enum(["pending", "approved", "rejected", "failed"]),
+  status: z.enum(["pending", "accepted", "discarded", "failed"]),
   version: z.string(),
   resolvedBy: z.string(),
 });
 
-export const zSyncEventStatus = z.enum(["pending", "approved", "rejected", "failed"]);
+export const zSyncEventStatus = z.enum(["pending", "accepted", "discarded", "failed"]);
 
 export const zSyncStatus = z.enum(["synced", "syncing", "conflict", "error"]);
 
@@ -293,7 +293,7 @@ export const zGetApiV1DataByApplicationIdHistoryResponse = z.object({
       syncId: z.string(),
       applicationId: z.enum(["salesforce", "hubspot", "stripe", "slack", "zendesk", "intercom"]),
       timestamp: z.string(),
-      status: z.enum(["pending", "approved", "rejected", "failed"]),
+      status: z.enum(["pending", "accepted", "discarded", "failed"]),
       version: z.string(),
       resolvedBy: z.string(),
     }),
@@ -310,7 +310,7 @@ export const zPostApiV1DataByApplicationIdResolveBody = z.object({
     current_value: z.string().optional(),
     new_value: z.string().optional(),
   }),
-  action: z.enum(["approve", "reject"]),
+  action: z.enum(["accept", "discard"]),
 });
 
 export const zPostApiV1DataByApplicationIdResolvePath = z.object({
@@ -331,7 +331,7 @@ export const zPostApiV1DataByApplicationIdResolveResponse = z.object({
     syncId: z.string(),
     applicationId: z.enum(["salesforce", "hubspot", "stripe", "slack", "zendesk", "intercom"]),
     timestamp: z.string(),
-    status: z.enum(["pending", "approved", "rejected", "failed"]),
+    status: z.enum(["pending", "accepted", "discarded", "failed"]),
     version: z.string(),
     resolvedBy: z.string(),
   }),

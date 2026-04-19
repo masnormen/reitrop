@@ -27,7 +27,7 @@ const IntegrationListResponseSchema = z.array(Integration);
 
 export const ResolveRequest = z.object({
   syncChange: SyncChange,
-  action: z.enum(["approve", "reject"]),
+  action: z.enum(["accept", "discard"]),
 });
 
 export const ResolveResponse = SyncEvent;
@@ -195,7 +195,7 @@ const integrationRoutes = createV1RouteApp()
     createRoute({
       tags: ["Integrations"],
       summary: "Resolve Sync Changes",
-      description: "Approve or reject sync changes",
+      description: "Accept or discard sync changes",
       method: "post",
       path: "/{application_id}/resolve",
       request: {
@@ -233,7 +233,7 @@ const integrationRoutes = createV1RouteApp()
         syncId,
         applicationId: application_id,
         timestamp: new Date().toISOString(),
-        status: action === "approve" ? "approved" : "rejected",
+        status: action === "accept" ? "accepted" : "discarded",
         version: integration?.version || "unknown",
         resolvedBy: c.var.session?.user.id || "",
         ...syncChange,

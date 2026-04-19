@@ -22,7 +22,7 @@ The application manages third-party integrations with a sync approval workflow:
 1. **Integrations**: Six supported services - Salesforce, HubSpot, Stripe, Slack, Zendesk, Intercom
 2. **Sync Process**: External API provides sync changes that need approval
 3. **Change Types**: ADD (new entity), UPDATE (field modification), DELETE (entity removal)
-4. **Approval Workflow**: Users review and approve/reject individual changes
+4. **Approval Workflow**: Users review and accept/discard individual changes
 
 **External API**: `https://portier-takehometest.onrender.com/api/v1/data/sync`
 
@@ -163,7 +163,7 @@ The backend is built with **Hono.js** and follows a modular route structure:
 - `GET /{application_id}` - Get specific integration details
 - `GET /{application_id}/history` - Get sync history for an integration
 - `GET /sync?application_id={id}` - Proxy to external API for sync data
-- `POST /{application_id}/resolve` - Approve/reject sync changes
+- `POST /{application_id}/resolve` - Accept/discard sync changes
 
 **Mock Data**: Integrations are mocked in `apps/api/src/mock.ts` for development.
 

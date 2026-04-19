@@ -1,23 +1,46 @@
-"use client";
+import type { SyncChange } from "@repo/sdk/types";
+import type { AxiosError } from "axios";
 
-import type { ApplicationId, SyncChange } from "@repo/sdk/types";
-
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   getApiV1AuthMeOptions,
   getApiV1DataByApplicationIdOptions,
   getApiV1DataSyncOptions,
-  postApiV1DataByApplicationIdResolveMutation,
 } from "@repo/sdk/query";
-import { zApplicationId } from "@repo/sdk/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { zApplicationId, zSyncChange } from "@repo/sdk/zod";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { clsx } from "clsx";
 import { sortBy } from "es-toolkit";
-import { Check, X, FileDiff, Plus, Minus, ArrowLeft } from "lucide-react";
+import { Check, X, FileDiff, Plus, Minus, ArrowLeft, Trash2, RefreshCcw } from "lucide-react";
+import { useForm, useWatch } from "react-hook-form";
+import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { confirm } from "@/components/ui/confirm";
 import { Skeleton } from "@/components/ui/skeleton";
+
+const ResolveChange = zSyncChange
+  .pick({
+    id: true,
+    change_type: true,
+    field_name: true,
+    current_value: true,
+    new_value: true,
+  })
+  .extend({
+    action: z
+      .enum(["accept", "discard"])
+      .nullable()
+      .refine((action) => (action != null) as boolean, {
+        message: "Action is required",
+      }),
+  });
+type ResolveChange = z.infer<typeof ResolveChange>;
+
+const ResolveFormSchema = z.record(z.string(), ResolveChange);
+type ResolveFormSchema = z.infer<typeof ResolveFormSchema>;
 
 export const Route = createFileRoute("/dashboard/$applicationId/resolve")({
   ssr: false,
@@ -47,6 +70,26 @@ function ResolvePage() {
     getApiV1DataByApplicationIdOptions({ path: { application_id: applicationId } }),
   );
 
+  const {
+    data: syncData,
+    status: syncDataStatus,
+    error: syncDataError,
+    isFetching: isSyncDataFetching,
+    refetch: refetchSyncData,
+  } = useQuery({
+    ...getApiV1DataSyncOptions({
+      query: { application_id: applicationId },
+    }),
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: false,
+  });
+
+  const changes = sortBy(syncData?.data?.sync_approval?.changes || [], [
+    "field_name",
+    "change_type",
+  ]);
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8 flex flex-row items-center">
@@ -62,39 +105,109 @@ function ResolvePage() {
         </div>
       </div>
 
-      <ResolveContent applicationId={applicationId} />
+      {syncDataStatus === "pending" || isSyncDataFetching ? (
+        <ResolveSkeleton />
+      ) : syncDataStatus === "error" ? (
+        <ResolveError error={syncDataError} retry={refetchSyncData} />
+      ) : (
+        <ResolveContent changes={changes} />
+      )}
     </div>
   );
 }
 
-function ResolveContent({ applicationId }: { applicationId: ApplicationId }) {
-  const { data: syncData, isLoading } = useQuery({
-    ...getApiV1DataSyncOptions({
-      query: { application_id: applicationId },
-    }),
-    staleTime: Infinity,
-    refetchOnWindowFocus: false,
+function ResolveError({
+  error,
+  retry,
+}: {
+  error: AxiosError<{
+    code: string;
+    message: string;
+    error: string;
+  }>;
+  retry?: () => void;
+}) {
+  const message = (() => {
+    // 4xx
+    if (error?.response && error?.response?.status >= 400 && error?.response?.status < 500) {
+      return "Failed to load sync data. This may be due to a missing configuration or an issue with the integration. Please check your integration settings and try again.";
+    }
+    // 502
+    if (error?.response && error?.response?.status === 502) {
+      return "Failed to load sync data due to a gateway error. Integration client server may be down. Please check the integration's status and try again later.";
+    }
+    return "Failed to load sync data due to an error. This may be a temporary issue with our servers or the integration's servers. Please try again later.";
+  })();
+
+  return (
+    <Card>
+      <CardContent className="mx-auto flex max-w-lg flex-col items-center gap-2 py-8 text-center">
+        <div className="flex items-center gap-2 font-semibold text-red-700">Error</div>
+        <p className="text-sm text-muted-foreground">{message}</p>
+        <Button onClick={retry} className="min-w-0">
+          <RefreshCcw />
+          Retry
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ResolveContent({ changes }: { changes: SyncChange[] }) {
+  const {
+    handleSubmit,
+    setValue,
+    control,
+    formState: { isSubmitting },
+  } = useForm({
+    mode: "onChange",
+    resolver: zodResolver(ResolveFormSchema),
+    defaultValues: changes.reduce(
+      (acc, change) => {
+        acc[change.id] = {
+          id: change.id,
+          change_type: change.change_type,
+          field_name: change.field_name,
+          current_value: change.current_value,
+          new_value: change.new_value,
+          action: null,
+        };
+        return acc;
+      },
+      {} as Record<string, ResolveChange>,
+    ),
   });
 
-  const resolveMutation = useMutation(postApiV1DataByApplicationIdResolveMutation());
-  const handleResolveIndividualChange = async (
-    _change: SyncChange,
-    _action: "approve" | "reject",
-  ) => {};
+  const watchedValues = useWatch({
+    control,
+  });
 
-  const changes = sortBy(syncData?.data?.sync_approval?.changes || [], [
-    "field_name",
-    "change_type",
-  ]);
+  const renderedChanges = changes.map((change) => ({
+    ...change,
+    action: watchedValues[change.id]?.action || null,
+  }));
 
-  if (isLoading) {
-    return <ResolveSkeleton />;
-  }
+  const onSubmit = async (data: Record<string, ResolveChange>) => {
+    void confirm({
+      title: "Submit Resolutions",
+      content: (
+        <pre>
+          <code>{JSON.stringify(data, null, 2)}</code>
+        </pre>
+      ),
+    });
+  };
+  const onError = () => {
+    void confirm({
+      title: "Error",
+      content: "Please choose an action for all changes before submitting.",
+    });
+  };
 
   if (!changes || changes.length === 0) {
     return (
       <Card>
-        <CardContent className="p-4">
+        <CardContent className="px-4 py-8 text-center">
           <p className="text-sm text-muted-foreground">No pending changes to resolve.</p>
         </CardContent>
       </Card>
@@ -102,33 +215,50 @@ function ResolveContent({ applicationId }: { applicationId: ApplicationId }) {
   }
 
   return (
-    <div className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6">
       <Card className="gap-0 border-muted">
         <CardContent>
           {changes.length} change{changes.length !== 1 ? "s" : ""} pending review
         </CardContent>
       </Card>
+
       <div className="flex flex-col gap-6">
-        {changes.map((change) => (
+        {renderedChanges.map((change) => (
           <ChangeRow
             key={change.id}
             change={change}
-            onResolve={handleResolveIndividualChange}
-            isPending={resolveMutation.isPending}
+            value={change.action}
+            onActionChange={(action) => setValue(`${change.id}.action`, action)}
           />
         ))}
       </div>
-    </div>
+
+      <Card className="border-primary/50 bg-primary/5">
+        <CardContent className="flex items-center justify-between p-4">
+          <div>
+            <p className="font-medium">Ready to submit</p>
+            <p className="text-sm text-muted-foreground">
+              {Object.values(watchedValues).filter((v) => v?.action === "accept").length} accepted,{" "}
+              {Object.values(watchedValues).filter((v) => v?.action === "discard").length}{" "}
+              discarded, from {changes.length} total changes.
+            </p>
+          </div>
+          <Button type="submit" size="lg" disabled={isSubmitting}>
+            Submit Resolutions
+          </Button>
+        </CardContent>
+      </Card>
+    </form>
   );
 }
 
 interface ChangeRowProps {
   change: SyncChange;
-  onResolve: (change: SyncChange, action: "approve" | "reject") => void;
-  isPending: boolean;
+  value: "accept" | "discard" | null;
+  onActionChange: (action: "accept" | "discard" | null) => void;
 }
 
-function ChangeRow({ change, onResolve, isPending }: ChangeRowProps) {
+function ChangeRow({ change, value, onActionChange }: ChangeRowProps) {
   const [entity, field] = change.field_name.split(".");
   const isAddition = change.change_type === "ADD";
   const isDeletion = change.change_type === "DELETE";
@@ -137,7 +267,13 @@ function ChangeRow({ change, onResolve, isPending }: ChangeRowProps) {
     <Card className="group gap-0 pb-0!">
       <div className="flex items-center justify-between border-b px-3 pb-3">
         <div className="flex items-center gap-2">
-          <FileDiff className="h-3.5 w-3.5 text-muted-foreground" />
+          {value == null ? (
+            <FileDiff className="size-4 text-muted-foreground" />
+          ) : value === "accept" ? (
+            <Check className="size-4 text-green-700" />
+          ) : (
+            <Trash2 className="size-4 text-red-700" />
+          )}
           <span className="text-sm font-medium text-muted-foreground">
             {entity}.{field}
           </span>
@@ -152,33 +288,36 @@ function ChangeRow({ change, onResolve, isPending }: ChangeRowProps) {
             {change.change_type}
           </span>
         </div>
-        <div className="flex gap-1.5 opacity-0 transition-opacity group-hover:opacity-100">
-          <Button
-            variant="outline"
-            size="xs"
-            onClick={() => onResolve(change, "reject")}
-            disabled={isPending}
+
+        <div className="flex gap-1.5">
+          <button
+            type="button"
+            onClick={() => onActionChange(value === "discard" ? null : "discard")}
             className={clsx(
-              "disabled:opacity-50",
-              "text-muted-foreground hover:bg-red-100 hover:text-red-700",
+              "flex h-6 items-center gap-1 rounded px-2 text-[10px] font-medium transition-all",
+              "border",
+              value === "discard"
+                ? "border-red-500 bg-red-500 text-white"
+                : "border-transparent bg-muted/50 text-muted-foreground hover:bg-red-100 hover:text-red-700",
             )}
           >
             <X className="size-3" />
-            Reject
-          </Button>
-          <Button
-            variant="outline"
-            size="xs"
-            onClick={() => onResolve(change, "approve")}
-            disabled={isPending}
+            Discard
+          </button>
+          <button
+            type="button"
+            onClick={() => onActionChange(value === "accept" ? null : "accept")}
             className={clsx(
-              "disabled:opacity-50",
-              "text-muted-foreground hover:bg-green-100 hover:text-green-700",
+              "flex h-6 items-center gap-1 rounded px-2 text-[10px] font-medium transition-all",
+              "border",
+              value === "accept"
+                ? "border-green-500 bg-green-500 text-white"
+                : "border-transparent bg-muted/50 text-muted-foreground hover:bg-green-100 hover:text-green-700",
             )}
           >
             <Check className="size-3" />
-            Approve
-          </Button>
+            Accept
+          </button>
         </div>
       </div>
 
@@ -259,23 +398,24 @@ function ResolveSkeleton() {
 
             <div className="grid grid-cols-2">
               <div className="border-r px-3 py-4">
-                <div className="flex items-center gap-1.5">
-                  <Skeleton className="size-3" />
-                  <Skeleton className="h-3 w-16" />
-                </div>
-                <Skeleton className="mt-2 h-3 w-full" />
+                <Skeleton className="h-3 w-16" />
+                <Skeleton className="mt-1 h-3 w-full" />
               </div>
               <div className="px-3 py-4">
-                <div className="flex items-center gap-1.5">
-                  <Skeleton className="size-3" />
-                  <Skeleton className="h-3 w-16" />
-                </div>
-                <Skeleton className="mt-2 h-3 w-full" />
+                <Skeleton className="h-3 w-16" />
+                <Skeleton className="mt-1 h-3 w-full" />
               </div>
             </div>
           </Card>
         ))}
       </div>
+
+      <Card className="border-primary/50 bg-primary/5">
+        <CardContent className="flex items-center justify-between p-4">
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-10 w-32" />
+        </CardContent>
+      </Card>
     </div>
   );
 }

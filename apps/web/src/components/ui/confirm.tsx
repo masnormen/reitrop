@@ -1,13 +1,6 @@
+import type React from "react";
+
 import { confirmable, createConfirmation, type ConfirmDialogProps } from "react-confirm";
-// const MyDialog = ({ show, proceed, message }: ConfirmDialogProps<{ message: string }, boolean>) => (
-//   <div className={`dialog-overlay ${show ? "show" : "hide"}`}>
-//     <div className="dialog">
-//       <p>{message}</p>
-//       <button onClick={() => proceed(true)}>Yes</button>
-//       <button onClick={() => proceed(false)}>No</button>
-//     </div>
-//   </div>
-// );
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,9 +22,9 @@ const ConfirmDialog = ({
   cancelText,
 }: ConfirmDialogProps<
   {
-    title: string;
-    description?: string;
-    content: string;
+    title: React.ReactNode;
+    description?: React.ReactNode;
+    content?: React.ReactNode;
     confirmText?: string;
     cancelText?: string;
   },
@@ -44,11 +37,13 @@ const ConfirmDialog = ({
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         {description && <DialogDescription>{description}</DialogDescription>}
-        {content}
+        {content && (
+          <div className="no-scrollbar -mx-4 max-h-[50vh] overflow-y-auto px-4">{content}</div>
+        )}
         <DialogFooter className="justify-end">
           {(cancelText || (!confirmText && !cancelText)) && (
             <Button type="button" variant="outline" onClick={() => proceed(false)}>
-              {cancelText}
+              {cancelText ?? (!confirmText ? "OK" : null)}
             </Button>
           )}
           {confirmText && (

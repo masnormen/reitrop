@@ -50,7 +50,7 @@ export type SyncData = z.infer<typeof SyncData>;
 export const ConnectionStatus = z.enum(["connected", "disconnected", "pending", "error"]);
 export type ConnectionStatus = z.infer<typeof ConnectionStatus>;
 
-export const SyncEventStatus = z.enum(["pending", "approved", "rejected", "failed"]);
+export const SyncEventStatus = z.enum(["pending", "accepted", "discarded", "failed"]);
 export type SyncEventStatus = z.infer<typeof SyncEventStatus>;
 
 export const SyncEvent = SyncChange.extend({

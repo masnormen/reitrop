@@ -112,12 +112,12 @@ export type SyncEvent = {
   syncId: string;
   applicationId: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
   timestamp: string;
-  status: "pending" | "approved" | "rejected" | "failed";
+  status: "pending" | "accepted" | "discarded" | "failed";
   version: string;
   resolvedBy: string;
 };
 
-export type SyncEventStatus = "pending" | "approved" | "rejected" | "failed";
+export type SyncEventStatus = "pending" | "accepted" | "discarded" | "failed";
 
 export type SyncStatus = "synced" | "syncing" | "conflict" | "error";
 
@@ -572,7 +572,7 @@ export type GetApiV1DataByApplicationIdHistoryResponses = {
       syncId: string;
       applicationId: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
       timestamp: string;
-      status: "pending" | "approved" | "rejected" | "failed";
+      status: "pending" | "accepted" | "discarded" | "failed";
       version: string;
       resolvedBy: string;
     }>;
@@ -599,7 +599,7 @@ export type PostApiV1DataByApplicationIdResolveData = {
       current_value?: string;
       new_value?: string;
     };
-    action: "approve" | "reject";
+    action: "accept" | "discard";
   };
   path: {
     application_id: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
@@ -629,7 +629,7 @@ export type PostApiV1DataByApplicationIdResolveResponses = {
       syncId: string;
       applicationId: "salesforce" | "hubspot" | "stripe" | "slack" | "zendesk" | "intercom";
       timestamp: string;
-      status: "pending" | "approved" | "rejected" | "failed";
+      status: "pending" | "accepted" | "discarded" | "failed";
       version: string;
       resolvedBy: string;
     };

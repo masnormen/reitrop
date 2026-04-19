@@ -269,7 +269,7 @@ export const getApiV1DataByApplicationIdHistoryOptions = (
 /**
  * Resolve Sync Changes
  *
- * Approve or reject sync changes
+ * Accept or discard sync changes
  */
 export const postApiV1DataByApplicationIdResolveMutation = (
   options?: Partial<Options<PostApiV1DataByApplicationIdResolveData>>,

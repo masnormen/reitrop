@@ -1,5 +1,3 @@
-"use client";
-
 import type { ApplicationId } from "@repo/sdk/types";
 
 import { getApiV1AuthMeOptions, getApiV1DataByApplicationIdOptions } from "@repo/sdk/query";
@@ -9,7 +7,7 @@ import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-route
 import dayjs from "dayjs";
 import { ArrowLeft, RefreshCcw, History } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusChip } from "@/components/ui/status-chip";
@@ -94,20 +92,21 @@ function IntegrationDetailContent({ applicationId }: { applicationId: Applicatio
               </div>
             </div>
             <div className="flex gap-2">
-              <Link to="/dashboard/$applicationId/history" params={{ applicationId }}>
-                <Button size="lg" variant="outline">
-                  <History /> History
-                </Button>
+              <Link
+                to="/dashboard/$applicationId/history"
+                params={{ applicationId }}
+                className={buttonVariants({ size: "lg", variant: "secondary" })}
+              >
+                <History /> History
               </Link>
               <Link
                 to="/dashboard/$applicationId/resolve"
                 params={{
                   applicationId,
                 }}
+                className={buttonVariants({ size: "lg" })}
               >
-                <Button size="lg" className="font-bold">
-                  <RefreshCcw /> Sync Now
-                </Button>
+                <RefreshCcw /> Sync Now
               </Link>
             </div>
           </div>

@@ -1,5 +1,3 @@
-"use client";
-
 import type { ApplicationId, SyncEvent } from "@repo/sdk/types";
 
 import { getApiV1AuthMeOptions, getApiV1DataByApplicationIdHistoryOptions } from "@repo/sdk/query";
@@ -110,14 +108,14 @@ function HistoryEventRow({ event }: HistoryEventRowProps) {
       label: "Pending",
       className: "bg-gray-100 text-gray-700 border-gray-200",
     },
-    approved: {
+    accepted: {
       icon: CheckCircle,
-      label: "Approved",
+      label: "Accepted",
       className: "bg-green-100 text-green-700 border-green-200",
     },
-    rejected: {
+    discarded: {
       icon: XCircle,
-      label: "Rejected",
+      label: "Discarded",
       className: "bg-red-100 text-red-700 border-red-200",
     },
     failed: {

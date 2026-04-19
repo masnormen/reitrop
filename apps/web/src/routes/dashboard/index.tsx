@@ -1,5 +1,3 @@
-"use client";
-
 import { getApiV1AuthMeOptions } from "@repo/sdk/query";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
